@@ -17,21 +17,6 @@ class TopController extends AppController
      */
     public function index()
     {
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id Top id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $top = $this->Top->get($id, [
-            'contain' => [],
-        ]);
-
-        $this->set(compact('top'));
+        $this->viewBuilder()->setLayout('common');
     }
 }
