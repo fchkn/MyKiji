@@ -28,8 +28,21 @@ services:
         ports:
             - 2435:3306
         environment:
-            MYSQL_DATABASE: sample
-            MYSQL_USER: user
-            MYSQL_PASSWORD: secret
-            MYSQL_ROOT_PASSWORD: secret
-            TZ: "Asia/Tokyo"
+            - MYSQL_DATABASE=mykiji
+            - MYSQL_USER=user
+            - MYSQL_PASSWORD=password
+            - MYSQL_ROOT_PASSWORD=password
+            - TZ="Asia/Tokyo"
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        depends_on:
+            - db
+        volumes:
+            - ./docker/phpmyadmin/sessions:/sessions
+        ports:
+            - "3000:80"
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOSTS=db
+            - PMA_USER=user
+            - PMA_PASSWORD=password

@@ -24,7 +24,7 @@
         //'port' => 'non_standard_port_number',
 
         'username' => 'user',
-        'password' => 'secret',
+        'password' => 'password',
 
-        'database' => 'sample',
+        'database' => 'mykiji',
 ```
