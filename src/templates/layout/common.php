@@ -18,7 +18,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel ="stylesheet" href="vendor/twbs/bootstrap/dist/css/bootstrap.css">
+    <link rel ="stylesheet" href="/vendor/twbs/bootstrap/dist/css/bootstrap.css">
 
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,6 +26,8 @@
         <?= $this->fetch('title') ?>
     </title>
     <?= $this->Html->meta('icon') ?>
+
+    <?= $this->Html->css('common') ?>
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -45,22 +47,3 @@
     <?= $this->element('footer') ?>
 </body>
 </html>
-
-<style>
-html {
-    height: 100%;
-}
-
-body {
-    height: 100%;
-    margin: 0;
-}
-
-main {
-    background: #f5f5f5;
-}
-
-.fullheight {
-    height: 100%;
-}
-</style>
