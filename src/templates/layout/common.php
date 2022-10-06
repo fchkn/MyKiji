@@ -18,7 +18,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel ="stylesheet" href="/vendor/twbs/bootstrap/dist/css/bootstrap.css">
+    <style><?php require(dirname(__FILE__) . '/../../vendor/twbs/bootstrap/dist/css/bootstrap.css'); ?></style>
 
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
