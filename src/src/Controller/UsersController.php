@@ -16,14 +16,12 @@ class UsersController extends AppController
         parent::beforeFilter($event);
         // ログインアクションを認証を必要としないように設定することで、
         // 無限リダイレクトループの問題を防ぐ
-        $this->Authentication->addUnauthenticatedActions(['login']);
+        $this->Authentication->addUnauthenticatedActions(['login', 'logout']);
     }
 
 
     /**
-     * login method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
+     * ログイン処理
      */
     public function login()
     {
@@ -44,6 +42,19 @@ class UsersController extends AppController
         // ユーザーの送信と認証に失敗した場合にエラーを表示する
         if ($this->request->is('post') && !$result->isValid()) {
             $this->Flash->error(__('メールアドレスまたはパスワードが間違っています。'));
+        }
+    }
+
+    /**
+     * ログアウト処理
+     */
+    public function logout()
+    {
+        $result = $this->Authentication->getResult();
+        // POSTやGETに関係なく、ユーザーがログインしていればリダイレクトする
+        if ($result->isValid()) {
+            $this->Authentication->logout();
+            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
     }
 }

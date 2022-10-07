@@ -13,7 +13,7 @@
                         <span><?php echo $username ?></span>
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">ログアウト</a>
+                        <a class="dropdown-item" href="/users/logout">ログアウト</a>
                     </div>
                 </div>
             </div>
