@@ -19,7 +19,9 @@
 <html>
 <head>
     <style><?php require(dirname(__FILE__) . '/../../vendor/twbs/bootstrap/dist/css/bootstrap.css'); ?></style>
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script><?php require(dirname(__FILE__) . '/../../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.js'); ?></script>
+    
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
@@ -34,6 +36,7 @@
     <?= $this->fetch('script') ?>
 
 </head>
+
 <body>
     <?= $this->element('header') ?>
 

@@ -51,4 +51,17 @@ class AppController extends Controller
          */
         //$this->loadComponent('FormProtection');
     }
+
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        // ログイン判定
+        $result = $this->Authentication->getResult();
+        $hasAuth = 'none';
+        $username = '';
+        if ($result->isValid()) {
+            $hasAuth = 'success';
+            $username = $this->Authentication->getIdentity()->name;
+        }
+        $this->set(compact('hasAuth', 'username'));
+    }
 }
