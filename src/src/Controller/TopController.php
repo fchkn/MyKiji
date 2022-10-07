@@ -10,6 +10,12 @@ namespace App\Controller;
  */
 class TopController extends AppController
 {
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        $this->Authentication->addUnauthenticatedActions(['index']);
+    }
+
     /**
      * Index method
      *

@@ -18,8 +18,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel ="stylesheet" href="vendor/twbs/bootstrap/dist/css/bootstrap.css">
-
+    <style><?php require(dirname(__FILE__) . '/../../vendor/twbs/bootstrap/dist/css/bootstrap.css'); ?></style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script><?php require(dirname(__FILE__) . '/../../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.js'); ?></script>
+    
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
@@ -27,11 +29,14 @@
     </title>
     <?= $this->Html->meta('icon') ?>
 
+    <?= $this->Html->css('common') ?>
+
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
 
 </head>
+
 <body>
     <?= $this->element('header') ?>
 
@@ -45,22 +50,3 @@
     <?= $this->element('footer') ?>
 </body>
 </html>
-
-<style>
-html {
-    height: 100%;
-}
-
-body {
-    height: 100%;
-    margin: 0;
-}
-
-main {
-    background: #f5f5f5;
-}
-
-.fullheight {
-    height: 100%;
-}
-</style>
