@@ -23,6 +23,5 @@ class TopController extends AppController
      */
     public function index()
     {
-        $this->viewBuilder()->setLayout('common');
     }
 }

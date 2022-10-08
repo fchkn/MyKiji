@@ -63,5 +63,8 @@ class AppController extends Controller
             $username = $this->Authentication->getIdentity()->name;
         }
         $this->set(compact('hasAuth', 'username'));
+
+        // 共通レイアウト適用
+        $this->viewBuilder()->setLayout('common');
     }
 }
