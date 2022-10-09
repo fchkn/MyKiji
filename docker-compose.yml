@@ -46,3 +46,8 @@ services:
             - PMA_HOSTS=db
             - PMA_USER=user
             - PMA_PASSWORD=password
+    mailhog:
+        image: mailhog/mailhog
+        ports:
+            - "8025:8025" 
+            - "1025:1025"

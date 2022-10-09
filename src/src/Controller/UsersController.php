@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Mailer\MailerAwareTrait;
+
 /**
  * Users Controller
  *
@@ -11,6 +13,8 @@ namespace App\Controller;
  */
 class UsersController extends AppController
 {
+    use MailerAwareTrait;
+
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
@@ -28,6 +32,8 @@ class UsersController extends AppController
         if ($this->request->is('post')) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
+                // 登録完了メールを送信
+                $this->getMailer('User')->send('register', [$user]);
 
                 // 認証設定してログイン状態にする
                 $this->Authentication->setIdentity($user);
