@@ -24,6 +24,37 @@ class UsersController extends AppController
     }
 
     /**
+     * ユーザー画面処理
+     */
+    public function view() {
+        $user_id = $this->request->getQuery('user_id');
+        $user_name = "";
+        $isMypage = false;
+
+        // ユーザーデータ取得処理
+        if (!empty($user_id) && is_numeric($user_id)) {
+            $user = $this->Users->findById($user_id);
+
+            if (!$user->isEmpty()) {
+                $user_name = $user->first()['name'];
+            } else {
+                // 存在しないユーザーの場合はトップ画面に遷移させる。
+                return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+            }
+        } else {
+            // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる。
+            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+        }
+
+        // マイページ判定
+        if ($this->hasAuth && $user_id == $this->auth_user_id) {
+            $isMypage = true;
+        }
+
+        $this->set(compact('user_name', 'isMypage'));
+    }
+
+    /**
      * ユーザー登録処理
      */
     public function add()

@@ -28,6 +28,10 @@ use Cake\Controller\Controller;
  */
 class AppController extends Controller
 {
+    protected $hasAuth = false;
+    protected $auth_user_id = '';
+    protected $auth_user_name = '';
+
     /**
      * Initialization hook method.
      *
@@ -56,13 +60,18 @@ class AppController extends Controller
     {
         // ログイン判定
         $result = $this->Authentication->getResult();
-        $hasAuth = 'none';
-        $username = '';
+
         if ($result->isValid()) {
-            $hasAuth = 'success';
-            $username = $this->Authentication->getIdentity()->name;
+            $this->hasAuth = true;
+            $this->auth_user_id = $this->Authentication->getIdentity()->id;
+            $this->auth_user_name = $this->Authentication->getIdentity()->name;
         }
-        $this->set(compact('hasAuth', 'username'));
+
+        $hasAuth = $this->hasAuth;
+        $auth_user_id = $this->auth_user_id;
+        $auth_user_name = $this->auth_user_name;
+
+        $this->set(compact('hasAuth', 'auth_user_id', 'auth_user_name'));
 
         // 共通レイアウト適用
         $this->viewBuilder()->setLayout('common');
