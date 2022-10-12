@@ -10,10 +10,10 @@
                 <div class="dropdown">
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="/img/default_icon.png" alt="default icon" class="img-thumbnail mr-1" style="width:40px; height:40px;">
-                        <span class="h6 text-secondary"><?php echo $auth_user_name ?></span>
+                        <span class="h6 text-secondary"><?php echo $auth_user->name ?></span>
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item text-secondary" href="/users/view?user_id=<?php echo $auth_user_id ?>">Myページ</a>
+                        <a class="dropdown-item text-secondary" href="/users/view?user_id=<?php echo $auth_user->id ?>">Myページ</a>
                         <a class="dropdown-item text-secondary" href="/users/logout">ログアウト</a>
                     </div>
                 </div>

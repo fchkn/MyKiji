@@ -20,7 +20,7 @@ class UsersController extends AppController
         parent::beforeFilter($event);
         // ログインアクションを認証を必要としないように設定することで、
         // 無限リダイレクトループの問題を防ぐ
-        $this->Authentication->addUnauthenticatedActions(['login', 'logout', 'add']);
+        $this->Authentication->addUnauthenticatedActions(['view', 'add', 'login', 'logout']);
     }
 
     /**
@@ -47,7 +47,7 @@ class UsersController extends AppController
         }
 
         // マイページ判定
-        if ($this->hasAuth && $user_id == $this->auth_user_id) {
+        if ($this->hasAuth && $user_id == $this->auth_user->id) {
             $isMypage = true;
         }
 
@@ -79,6 +79,13 @@ class UsersController extends AppController
      * ユーザー登録完了処理
      */
     public function complete()
+    {
+    }
+
+    /**
+     * ユーザー編集処理
+     */
+    public function edit()
     {
     }
     
