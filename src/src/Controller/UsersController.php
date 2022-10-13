@@ -87,6 +87,32 @@ class UsersController extends AppController
      */
     public function edit()
     {
+        if (!empty($_POST)) {
+            $user = $this->Users->get($this->auth_user->id);
+            $post_data = $this->request->getData();
+
+            if (isset($post_data['edit_profileinfo'])) {
+                // プロフィール情報変更
+                $this->Users->patchEntity($user, ['name' => $post_data['name']]);
+            } else if (isset($post_data['edit_email'])) {
+                // メールアドレス変更
+                $this->Users->patchEntity($user, ['email' => $post_data['email']]);
+            } else if (isset($post_data['edit_password'])) {
+                // パスワード変更
+                $this->Users->patchEntity($user, ['password' => $post_data['password_new']]);
+            }
+
+            // テーブルを更新
+            if ($this->Users->save($user)) {
+                // 認証を再設定
+                $this->Authentication->setIdentity($user);
+                $auth_user = $this->Authentication->getIdentity();
+                $this->set(compact('auth_user'));
+                echo '<script>alert("変更しました。")</script>';
+            } else {
+                $this->Flash->error(__('変更に失敗しました。'));
+            }
+        }
     }
     
     /**
