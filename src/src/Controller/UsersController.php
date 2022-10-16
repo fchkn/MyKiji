@@ -63,9 +63,6 @@ class UsersController extends AppController
         if ($this->request->is('post')) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
-                // 登録完了メールを送信
-                $this->getMailer('User')->send('register', [$user]);
-
                 // 認証設定してログイン状態にする
                 $this->Authentication->setIdentity($user);
 
@@ -80,6 +77,11 @@ class UsersController extends AppController
      */
     public function complete()
     {
+        // 登録完了メールを送信
+        $this->getMailer('User')->send('register', [$this->auth_user]);
+
+        // プロフィール画像にデフォルトアイコンを設定
+        copy(WWW_ROOT . 'img/default_icon.jpg', UPLOAD_PROFILE_IMG_PATH . 'user_' . $this->auth_user->id .  '.jpg');
     }
 
     /**
@@ -87,12 +89,17 @@ class UsersController extends AppController
      */
     public function edit()
     {
-        if (!empty($_POST)) {
+        if ($this->request->is('post')) {
             $user = $this->Users->get($this->auth_user->id);
             $post_data = $this->request->getData();
 
             if (isset($post_data['edit_profileinfo'])) {
-                // プロフィール情報変更
+                // プロフィール画像変更
+                if (!empty($post_data['profile_img']->getClientFilename())) {
+                    $this->saveProfileImg($post_data['profile_img'], $user->id);
+                }
+
+                // ユーザー名変更
                 $this->Users->patchEntity($user, ['name' => $post_data['name']]);
             } else if (isset($post_data['edit_email'])) {
                 // メールアドレス変更
@@ -148,6 +155,26 @@ class UsersController extends AppController
         if ($result->isValid()) {
             $this->Authentication->logout();
             return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+        }
+    }
+
+    /**
+     * プロフィール画像保存処理
+     */
+    private function saveProfileImg($profile_img, $user_id)
+    {
+        // プロフィール画像保存先のパス
+        $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
+
+        $type = $profile_img->getClientMediaType();
+        $file = $profile_img->getStream()->getMetadata('uri');
+        $png_img = $type == 'image/png' ? imagecreatefrompng($file) : false;
+        if ($png_img) {
+            // プロフィール画像がpngの場合はjpgに変換して保存
+            imagejpeg($png_img, $profile_img_path);
+        } else {
+            // プロフィール画像がjpgの場合はそのまま保存
+            $profile_img->moveTo($profile_img_path);
         }
     }
 }

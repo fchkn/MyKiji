@@ -12,6 +12,10 @@ RUN apk --no-cache update \
     && apk add autoconf \
     && apk add gcc g++ make \
     && pecl install xdebug \
-    && docker-php-ext-enable xdebug
+    && docker-php-ext-enable xdebug \
+    && apk add libjpeg-turbo-dev libwebp-dev libpng-dev\
+    && docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
+
 
 WORKDIR /var/www

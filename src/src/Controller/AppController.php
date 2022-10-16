@@ -70,6 +70,7 @@ class AppController extends Controller
 
         $this->set(compact('hasAuth', 'auth_user'));
 
+
         // 共通レイアウト適用
         $this->viewBuilder()->setLayout('common');
     }

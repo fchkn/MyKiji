@@ -5,7 +5,7 @@
  */
 ?>
 <?= $this->Flash->render() ?>
-<form class="w-75 mx-auto" method="post">
+<form class="w-75 mx-auto" method="post" enctype="multipart/form-data">
 <div class="container-fluid">
     <div class="row py-5 justify-content-center">
         <div class="col-12 align-self-center text-center text-secondary">
@@ -20,9 +20,10 @@
     <div class="row mb-5 py-4">
         <div class="col-8 align-self-center text-left"><small class="text-muted">プロフィール画像</small></div>
         <div class="col-4 text-right"><input type="submit" class="btn btn-secondary btn-sm" name="edit_profileinfo" value="変更を保存"/></div>
-        <div class="col-2 text-left"><img src="/img/default_icon.png" alt="default icon" class="img-thumbnail mr-1" style="width:80px; height:80px;"></div>
+        <div class="col-2 text-left"><img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="width:80px; height:80px;">
+    </div>
         <div class="col-10 m-0 align-self-center text-left form-group">
-            <input type="file" class="form-control-file" value="ファイルを選択">
+            <input type="file" class="form-control-file" name="profile_img" value="ファイルを選択">
             <p class="m-0 text-secondary">設定できる画像は、5MB以内・JPG/PNG形式です。</p>
         </div>
         <div class="col-8 mt-3 text-left">

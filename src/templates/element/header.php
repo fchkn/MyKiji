@@ -9,7 +9,7 @@
             <div class="col-3 align-self-center text-left">
                 <div class="dropdown">
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="/img/default_icon.png" alt="default icon" class="img-thumbnail mr-1" style="width:40px; height:40px;">
+                        <img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="width:40px; height:40px;">
                         <span class="h6 text-secondary"><?php echo $auth_user->name ?></span>
                     </button>
                     <div class="dropdown-menu">

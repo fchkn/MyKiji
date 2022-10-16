@@ -15,6 +15,7 @@ services:
         build: ./docker/php
         volumes:
             - ./src:/var/www
+            - ./src/webroot/upload/profile_img:/var/www/webroot/upload/profile_img
         links:
             - db
         depends_on:
