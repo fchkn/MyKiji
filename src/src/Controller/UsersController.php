@@ -20,7 +20,7 @@ class UsersController extends AppController
         parent::beforeFilter($event);
         // ログインアクションを認証を必要としないように設定することで、
         // 無限リダイレクトループの問題を防ぐ
-        $this->Authentication->addUnauthenticatedActions(['view', 'add', 'login', 'logout']);
+        $this->Authentication->addUnauthenticatedActions(['view', 'add', 'delete_complete', 'login', 'logout']);
     }
 
     /**
@@ -59,14 +59,20 @@ class UsersController extends AppController
      */
     public function add()
     {
-        $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
+            $user = $this->Users->newEmptyEntity();
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
                 // 認証設定してログイン状態にする
                 $this->Authentication->setIdentity($user);
 
-                return $this->redirect(['controller' => 'Users', 'action' => 'complete']);
+                // プロフィール画像にデフォルトアイコンを設定
+                copy(WWW_ROOT . 'img/default_icon.jpg', UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
+
+                // 登録完了メールを送信
+                $this->getMailer('User')->send('register', [$user]);
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'add_complete']);
             }
             $this->Flash->error(__('登録ができませんでした。'));
         }
@@ -75,13 +81,8 @@ class UsersController extends AppController
     /**
      * ユーザー登録完了処理
      */
-    public function complete()
+    public function add_complete()
     {
-        // 登録完了メールを送信
-        $this->getMailer('User')->send('register', [$this->auth_user]);
-
-        // プロフィール画像にデフォルトアイコンを設定
-        copy(WWW_ROOT . 'img/default_icon.jpg', UPLOAD_PROFILE_IMG_PATH . 'user_' . $this->auth_user->id .  '.jpg');
     }
 
     /**
@@ -121,7 +122,41 @@ class UsersController extends AppController
             }
         }
     }
-    
+
+    /**
+     * ユーザー退会処理
+     */
+    public function delete()
+    {
+        if ($this->request->is('post')) {
+            $user = $this->Users->get($this->auth_user->id);
+
+            // ユーザーデータを削除
+            if ($this->Users->delete($user)) {
+                // ログアウト処理を実行
+                if ($this->Authentication->getResult()->isValid()) {
+                    $this->Authentication->logout();
+                }
+
+                // プロフィール画像を削除
+                unlink(UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
+
+                // 退会完了メールを送信
+                $this->getMailer('User')->send('withdrawal', [$user]);
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'delete_complete']);
+            }
+            $this->Flash->error(__('退会ができませんでした。'));
+        }
+    }
+
+    /**
+     * ユーザー退会完了処理
+     */
+    public function delete_complete()
+    {
+    }
+
     /**
      * ログイン処理
      */

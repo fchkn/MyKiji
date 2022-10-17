@@ -58,7 +58,7 @@
     </div>
     <div class="row mb-5 py-4">
         <div class="col-8 text-left"><span class="text-danger">※退会するとアカウントは復元できません。<br>　投稿した記事は全て削除されます。</span></div>
-        <div class="col-4 text-right"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href=''" value="退会手続きに進む"/></div>
+        <div class="col-4 text-right"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/delete'" value="退会手続きに進む"/></div>
     </div>
 
     <div class="row py-5 justify-content-center">

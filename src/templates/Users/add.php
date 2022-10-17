@@ -9,7 +9,7 @@
 <div class="container-fluid">
     <div class="row py-5 justify-content-center">
         <div class="col-6 align-self-center text-center text-secondary offset-3">
-            <h2>MyKijiに新規登録<h2>
+            <h2>MyKiji新規登録<h2>
             <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
         </div>
         <div class="col-3"></div>
