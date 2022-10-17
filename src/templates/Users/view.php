@@ -8,8 +8,8 @@
 <div class="container-fluid" style="height: 100%;">
     <div class="row top-bar pt-5">
         <div class="col-8 align-self-center text-left pl-5">
-            <img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="width:80px; height:80px;">
-            <span class="h3 text-secondary ml-3"><?php echo $user_name ?></span>
+            <img src="/upload/profile_img/user_<?php echo $user->first()['id'] ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="width:80px; height:80px;">
+            <span class="h3 text-secondary ml-3"><?php echo $user->first()['name'] ?></span>
         </div>
         <div class="col-4 align-self-center text-right pr-5">
             <?php if($isMypage): ?>

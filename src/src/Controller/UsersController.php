@@ -28,21 +28,19 @@ class UsersController extends AppController
      */
     public function view() {
         $user_id = $this->request->getQuery('user_id');
-        $user_name = "";
+        $user = null;
         $isMypage = false;
 
-        // ユーザーデータ取得処理
+        // ユーザーデータ取得
         if (!empty($user_id) && is_numeric($user_id)) {
             $user = $this->Users->findById($user_id);
 
-            if (!$user->isEmpty()) {
-                $user_name = $user->first()['name'];
-            } else {
-                // 存在しないユーザーの場合はトップ画面に遷移させる。
+            if ($user->isEmpty()) {
+                // 存在しないユーザーの場合はトップ画面に遷移させる
                 return $this->redirect(['controller' => 'Top', 'action' => 'index']);
             }
         } else {
-            // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる。
+            // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
             return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
 
@@ -51,7 +49,7 @@ class UsersController extends AppController
             $isMypage = true;
         }
 
-        $this->set(compact('user_name', 'isMypage'));
+        $this->set(compact('user', 'isMypage'));
     }
 
     /**
