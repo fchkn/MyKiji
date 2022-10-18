@@ -196,18 +196,46 @@ class UsersController extends AppController
      */
     private function saveProfileImg($profile_img, $user_id)
     {
-        // プロフィール画像保存先のパス
-        $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
-
-        $type = $profile_img->getClientMediaType();
         $file = $profile_img->getStream()->getMetadata('uri');
-        $png_img = $type == 'image/png' ? imagecreatefrompng($file) : false;
-        if ($png_img) {
-            // プロフィール画像がpngの場合はjpgに変換して保存
-            imagejpeg($png_img, $profile_img_path);
-        } else {
-            // プロフィール画像がjpgの場合はそのまま保存
-            $profile_img->moveTo($profile_img_path);
+        $type = $profile_img->getClientMediaType();
+
+        // 元画像のファイルデータを作成
+        $src_img = null;
+        if ($type == 'image/jpg' || $type == 'image/jpeg') {
+            $src_img = imagecreatefromjpeg($file);
+        } else if ($type == 'image/png') {
+            $src_img = imagecreatefrompng($file);
         }
+
+        // 元画像の縦横の大きさを比べて小さい方に合わせる
+        // 縦横の差をコピー開始位置として使えるようセット
+        $src_w = imagesx($src_img);
+        $src_h = imagesy($src_img);
+        $src_x = 0;
+        $src_y = 0;
+        if ($src_w > $src_h){
+            $src_x = (int)(($src_w - $src_h) * 0.5);
+            $src_w = $src_h;
+        } else if($src_w < $src_h){
+            $src_y = (int)(($src_h - $src_w) * 0.5);
+            $src_h = $src_w;
+        }
+
+        // 規定サイズで新規画像作成
+        $dst_w = 240;
+        $dst_h = 240;
+        $dst_img = imagecreatetruecolor($dst_w, $dst_h);
+        imagefill($dst_img , 0 , 0 , 0xFFFFFF);
+
+        // 新規画像にプロフィール画像を貼付け
+        imagecopyresampled($dst_img, $src_img, 0, 0, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
+
+        // 成型したプロフィール画像を保存
+        $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
+        imagejpeg($dst_img, $profile_img_path);
+
+        // リソースを解放
+        imagedestroy($src_img);
+        imagedestroy($dst_img);
     }
 }
