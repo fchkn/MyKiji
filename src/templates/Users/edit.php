@@ -20,7 +20,7 @@
     <div class="row mb-5 py-4">
         <div class="col-8 align-self-center text-left"><small class="text-muted">プロフィール画像</small></div>
         <div class="col-4 text-right"><input type="submit" class="btn btn-secondary btn-sm" name="edit_profileinfo" value="変更を保存"/></div>
-        <div class="col-2 text-left"><img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="width:80px; height:80px;">
+        <div class="col-2 text-left"><img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="min-width:60px; min-height:60px;">
     </div>
         <div class="col-10 m-0 align-self-center text-left form-group">
             <input type="file" class="form-control-file" name="profile_img" value="ファイルを選択">
