@@ -8,13 +8,13 @@
 <div class="container-fluid" style="height: 100%;">
     <div class="row top-bar pt-5">
         <div class="col-8 align-self-center text-left pl-5">
-            <img src="/img/default_icon.png" alt="default icon" class="img-thumbnail mr-1" style="width:80px; height:80px;">
-            <span class="h3 text-secondary ml-3"><?php echo $user_name ?></span>
+            <img src="/upload/profile_img/user_<?php echo $user->first()['id'] ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="max-width:100px; max-height:100px; min-width:60px; min-height:60px;">
+            <span class="h3 text-secondary ml-3"><?php echo $user->first()['name'] ?></span>
         </div>
         <div class="col-4 align-self-center text-right pr-5">
             <?php if($isMypage): ?>
             <p class="mb-3"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href=''" value="記事を投稿する"/></p>
-            <p class="m-0"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href=''" value="アカウント設定"/></p>
+            <p class="m-0"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/edit'" value="アカウント設定"/></p>
             <?php endif; ?>
         </div>
     

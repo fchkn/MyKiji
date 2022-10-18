@@ -40,8 +40,8 @@
 <body>
     <?= $this->element('header') ?>
 
-    <main class="fullheight">
-        <div class="container fullheight bg-white p-0" style="border: solid 30px #f5f5f5;">
+    <main>
+        <div class="container bg-white p-0">
             <?= $this->Flash->render() ?>
             <?= $this->fetch('content') ?>
         </div>

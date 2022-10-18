@@ -9,9 +9,19 @@ class UserMailer extends Mailer
 	{
 		$this->setProfile('default')
 		    ->setTo($user->email)
-			->setSubject('[MyKiji]アカウント登録完了')
+			->setSubject('MyKiji登録完了')
             ->setviewVars(['user' => $user]);
-        
+
         $this->viewBuilder()->setTemplate('register_mail');
+	}
+
+	public function withdrawal($user)
+	{
+		$this->setProfile('default')
+		    ->setTo($user->email)
+			->setSubject('MyKiji退会完了')
+            ->setviewVars(['user' => $user]);
+
+        $this->viewBuilder()->setTemplate('withdraw_mail');
 	}
 }
