@@ -13,7 +13,7 @@
         </div>
         <div class="col-4 align-self-center text-right pr-5">
             <?php if($isMypage): ?>
-            <p class="mb-3"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href=''" value="記事を投稿する"/></p>
+            <p class="mb-3"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
             <p class="m-0"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/edit'" value="アカウント設定"/></p>
             <?php endif; ?>
         </div>
