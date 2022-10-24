@@ -29,7 +29,7 @@
 
     <div class="row py-5">
         <div class="col-12 mb-5">
-            <input type="text" id="text" name="text" style="display:none"></textarea>
+            <input type="text" id="title" name="title" style="display:none"></input>
             <h1 id ='title_view'></h1>
         </div>
         <div class="col-12">
