@@ -16,5 +16,15 @@ class ArticlesController extends AppController
      */
     public function add()
     {
+        if ($this->request->is('post')) {
+            $article = $this->Articles->newEmptyEntity();
+            $post_data = array_merge(['user_id' => $this->auth_user->id], $this->request->getData());
+            $this->Articles->patchEntity($article, $post_data);
+
+            if ($this->Articles->save($article)) {
+                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
+            }
+            $this->Flash->error(__('記事追加に失敗しました'));
+        }
     }
 }
