@@ -1,0 +1,45 @@
+img.icon {
+    max-width:80px; max-width:80px; min-width:30px; min-height:30px;
+}
+
+button {
+    background-color: transparent;
+    border-style: none;
+}
+
+button:focus {
+    outline: none;
+}
+
+button:hover {
+    opacity: 0.75;
+}
+
+.modal-header {
+    border-style: none;
+}
+
+.modal-body {
+    height: 600px;
+    border-style: none;
+}
+
+.modal-footer {
+    border-style: none;
+}
+
+.ql-container {
+    height: 90%;
+}
+
+.ql-editor * img {
+    max-width: 50vw;
+}
+
+#text_view * img {
+    max-width: 50vw;
+}
+
+.col-12.ql-container.ql-snow {
+    border-style: none;
+}
