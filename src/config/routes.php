@@ -42,7 +42,7 @@ return static function (RouteBuilder $routes) {
      * inconsistently cased URLs when used with `{plugin}`, `{controller}` and
      * `{action}` markers.
      */
-    $routes->setRouteClass(DashedRoute::class);
+    $routes->setRouteClass(InflectedRoute::class);
 
     $routes->scope('/', function (RouteBuilder $builder) {
         /*

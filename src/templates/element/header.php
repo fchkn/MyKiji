@@ -5,15 +5,16 @@
         <div class="col-1"></div>
         <div class="col-4 align-self-center text-center"><input type="text" class="form-control" placeholder="キーワードで検索"></div>
         <div class="col-1"></div>
-        <?php if($hasAuth === 'success'): ?>
+        <?php if($hasAuth): ?>
             <div class="col-3 align-self-center text-left">
                 <div class="dropdown">
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="/img/default_icon.png" alt="default icon" class="img-thumbnail mr-1" style="width:40px; height:40px;">
-                        <span><?php echo $username ?></span>
+                        <img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1" style="width:40px; height:40px;">
+                        <span class="h6 text-secondary"><?php echo $auth_user->name ?></span>
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/users/logout">ログアウト</a>
+                        <a class="dropdown-item text-secondary" href="/users/view?user_id=<?php echo $auth_user->id ?>">Myページ</a>
+                        <a class="dropdown-item text-secondary" href="/users/logout">ログアウト</a>
                     </div>
                 </div>
             </div>
