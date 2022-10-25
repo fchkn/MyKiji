@@ -9,11 +9,6 @@ CREATE TABLE users (
     modified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-/* 初期ユーザー（password: p@ssw0rd）追加 */
-INSERT INTO users (id, name, password, email)
-VALUES (1, 'user01', '$2y$10$chRR/dnRQgyJ4gVlscsIc.aiDsFs1QUT/.AiCfPf.Rru5LixtAfP6', 'user01@example.com');
-
-
 /* ================================================================================= */
 /* 記事テーブル追加 */
 CREATE TABLE articles (
