@@ -96,4 +96,5 @@ define('CAKE', CORE_PATH . 'src' . DS);
 /*
  * Path to upload file directory
  */
+define('UPLOAD_ARTICLE_IMG_PATH', WWW_ROOT . 'upload' . DS . 'article_img'. DS);
 define('UPLOAD_PROFILE_IMG_PATH', WWW_ROOT . 'upload' . DS . 'profile_img'. DS);

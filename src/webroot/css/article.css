@@ -2,10 +2,6 @@ img.icon {
     max-width:80px; max-width:80px; min-width:30px; min-height:30px;
 }
 
-a:hover {
-    opacity: 0.75;
-}
-
 button {
     background-color: transparent;
     border-style: none;
@@ -34,4 +30,16 @@ button:hover {
 
 .ql-container {
     height: 90%;
+}
+
+.ql-editor * img {
+    max-width: 50vw;
+}
+
+#text_view * img {
+    max-width: 50vw;
+}
+
+.col-12.ql-container.ql-snow {
+    border-style: none;
 }

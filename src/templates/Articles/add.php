@@ -32,9 +32,9 @@
             <input type="text" id="title" name="title" style="display:none"></input>
             <h1 id ='title_view'></h1>
         </div>
-        <div class="col-12">
+        <div class="col-12 ql-container ql-snow">
             <textarea id="text" name="text" style="display:none"></textarea>
-            <div id ='text_view'></div>
+            <div class="ql-editor" id ='text_view'></div>
         </div>
     </div>
 
