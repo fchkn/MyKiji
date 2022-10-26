@@ -46,7 +46,7 @@
                     <?php else: ?>
                     <div class="list-group px-5">
                         <?php foreach ($post_articles as $post_article) : ?>
-                        <a class="list-group-item list-group-item-action" href="#">
+                        <a class="list-group-item list-group-item-action" href="/articles/view?article_id=<?php echo $post_article->id?>">
                             <div class="row align-items-center">
                                 <div class="col-12 mb-2"><h3 class="text-secondary"><?php echo $post_article->title ?></h3></div>
                                 <div class="col-1"><img src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1 userimg-article"></div>

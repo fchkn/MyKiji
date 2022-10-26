@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\ORM\TableRegistry;
 use DOMDocument;
 
 /**
@@ -13,6 +14,46 @@ use DOMDocument;
  */
 class ArticlesController extends AppController
 {
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // ログインアクションを認証を必要としないように設定することで、
+        // 無限リダイレクトループの問題を防ぐ
+        $this->Authentication->addUnauthenticatedActions(['view']);
+    }
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->Users = TableRegistry::get('users');
+    }
+
+    /**
+     * 記事詳細画面処理
+     */
+    public function view() {
+        $article_id = $this->request->getQuery('article_id');
+        $article = null;
+
+        // 記事データ取得
+        if (!empty($article_id) && is_numeric($article_id)) {
+            $article = $this->Articles->findById($article_id)->first();
+
+            if (is_null($article)) {
+                // 存在しない記事の場合はトップ画面に遷移させる
+                return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+            }
+        } else {
+            // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
+            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+        }
+
+        // ユーザーデータ取得
+        $user = $this->Users->findById($article->user_id)->first();
+
+        $this->set(compact('article', 'user'));
+    }
+
     /**
      * 記事追加処理
      */
