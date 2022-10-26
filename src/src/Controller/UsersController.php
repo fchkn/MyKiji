@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\ORM\TableRegistry;
 use Cake\Mailer\MailerAwareTrait;
 
 /**
@@ -23,6 +24,12 @@ class UsersController extends AppController
         $this->Authentication->addUnauthenticatedActions(['view', 'add', 'delete_complete', 'login', 'logout']);
     }
 
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->Articles = TableRegistry::get('articles');
+    }
+
     /**
      * ユーザー画面処理
      */
@@ -33,9 +40,9 @@ class UsersController extends AppController
 
         // ユーザーデータ取得
         if (!empty($user_id) && is_numeric($user_id)) {
-            $user = $this->Users->findById($user_id);
+            $user = $this->Users->findById($user_id)->first();
 
-            if ($user->isEmpty()) {
+            if (is_null($user)) {
                 // 存在しないユーザーの場合はトップ画面に遷移させる
                 return $this->redirect(['controller' => 'Top', 'action' => 'index']);
             }
@@ -44,12 +51,15 @@ class UsersController extends AppController
             return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
 
+        // 投稿記事データ取得
+        $post_articles = $this->Articles->find()->where(['user_id' => $user_id])->toArray();
+
         // マイページ判定
         if ($this->hasAuth && $user_id == $this->auth_user->id) {
             $isMypage = true;
         }
 
-        $this->set(compact('user', 'isMypage'));
+        $this->set(compact('user', 'post_articles', 'isMypage'));
     }
 
     /**
