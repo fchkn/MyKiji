@@ -17,3 +17,9 @@ main {
     min-height:40px;
     min-width:40px;
 }
+
+.page-link:focus {
+    z-index: 3;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem #e4e3e3;
+}

@@ -16,6 +16,10 @@ class UsersController extends AppController
 {
     use MailerAwareTrait;
 
+    public $paginate = [
+        'limit' => 5,
+    ];
+
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
@@ -27,6 +31,7 @@ class UsersController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+        $this->loadComponent('Paginator');
         $this->Articles = TableRegistry::get('articles');
     }
 
@@ -52,7 +57,7 @@ class UsersController extends AppController
         }
 
         // 投稿記事データ取得
-        $post_articles = $this->Articles->find()->where(['user_id' => $user_id])->toArray();
+        $post_articles = $this->paginate($this->Articles->find()->where(['user_id' => $user_id])->order(['created' => 'desc']));
 
         // マイページ判定
         if ($this->hasAuth && $user_id == $this->auth_user->id) {
