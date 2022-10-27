@@ -10,7 +10,11 @@
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
 <div class="container-fluid">
     <div class="row pt-5 align-items-center">
-        <div class="col-1"><img src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1 userimg-article"></div>
+        <div class="col-1">
+            <button type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
+                <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img">
+            </button>
+        </div>
         <div class="col-11">
             <p class="m-0 text-secondary"><?php echo $user->name ?></p>
             <p class="m-0 text-secondary">投稿日: <?php echo date('Y/m/d G:i',  strtotime($article->created)) ?>&emsp;更新日: <?php echo date('Y/m/d G:i',  strtotime($article->modified)) ?></p>
