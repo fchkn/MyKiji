@@ -44,30 +44,30 @@
                     <?php if ($post_articles->isEmpty()): ?>
                         <h3 class="text-center text-secondary">投稿記事はありません</h3>
                     <?php else: ?>
-                    <div class="list-group px-5">
-                        <?php foreach ($post_articles as $post_article) : ?>
-                        <a class="list-group-item list-group-item-action" href="/articles/view?article_id=<?php echo $post_article->id?>">
-                            <div class="row align-items-center">
-                                <div class="col-1"><img src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1 userimg-article"></div>
-                                <div class="col-11">
-                                    <p class="m-0 text-secondary"><?php echo $user->name ?></p>
-                                    <p class="m-0 text-secondary"><?php echo date('Y/m/d G:i',  strtotime($post_article->created)) ?></p>
-                                </div>
-                                <div class="col-12 mt-3"><h3 class="text-secondary"><?php echo $post_article->title ?></h3></div>
-                            </div>
-                        </a>
-                        <?php endforeach; ?>
-                        <!-- ページネーション要素 -->
-                        <ul class="mt-5 pagination d-flex justify-content-center">
-                            <?= $this->Paginator->prev('<') ?>
-                            <?= $this->Paginator->numbers([
-                                'first' => 1,
-                                'modulus' => 2,
-                                'last' => 1
-                            ]) ?>
-                            <?= $this->Paginator->next('>') ?>
-                        </ul>
-                    </div>
+                        <div class="list-group px-5">
+                            <?php foreach ($post_articles as $post_article) : ?>
+                                <a class="list-group-item list-group-item-action" href="/articles/view?article_id=<?php echo $post_article->id?>">
+                                    <div class="row align-items-center">
+                                        <div class="col-1"><img src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1 userimg-article"></div>
+                                        <div class="col-11">
+                                            <p class="m-0 text-secondary"><?php echo $user->name ?></p>
+                                            <p class="m-0 text-secondary"><?php echo date('Y/m/d G:i',  strtotime($post_article->created)) ?></p>
+                                        </div>
+                                        <div class="col-12 mt-3"><h3 class="text-secondary"><?php echo $post_article->title ?></h3></div>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                            <!-- ページネーション要素 -->
+                            <ul class="mt-5 pagination justify-content-center">
+                                <?= $this->Paginator->prev('<') ?>
+                                <?= $this->Paginator->numbers([
+                                    'first' => 1,
+                                    'modulus' => 2,
+                                    'last' => 1
+                                ]) ?>
+                                <?= $this->Paginator->next('>') ?>
+                            </ul>
+                        </div>
                     <?php endif; ?>
                 </div>
                 <!-- お気に入り記事 -->

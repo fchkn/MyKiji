@@ -14,17 +14,22 @@ use DOMDocument;
  */
 class ArticlesController extends AppController
 {
+    public $paginate = [
+        'limit' => 10,
+    ];
+
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
         // ログインアクションを認証を必要としないように設定することで、
         // 無限リダイレクトループの問題を防ぐ
-        $this->Authentication->addUnauthenticatedActions(['view']);
+        $this->Authentication->addUnauthenticatedActions(['view', 'search']);
     }
 
     public function initialize(): void
     {
         parent::initialize();
+        $this->loadComponent('Paginator');
         $this->Users = TableRegistry::get('users');
     }
 
@@ -52,6 +57,22 @@ class ArticlesController extends AppController
         $user = $this->Users->findById($article->user_id)->first();
 
         $this->set(compact('article', 'user'));
+    }
+
+    /**
+     * 記事検索処理
+     */
+    public function search() {
+        $search_word = $this->request->getQuery('q');
+
+        // 検索記事データ取得
+        $search_articles = $this->paginate($this->Articles->find('all', [
+            'conditions' => ['Articles.title LIKE' => '%' . $search_word . '%'],
+            'contain' => ['Users'],
+            'order' => ['Articles.created' => 'desc'],
+        ]));
+
+        $this->set(compact('search_word', 'search_articles'));
     }
 
     /**
