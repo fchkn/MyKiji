@@ -51,7 +51,7 @@
                                 <div class="col-1"><img src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1 userimg-article"></div>
                                 <div class="col-11">
                                     <p class="m-0 text-secondary"><?php echo $user->name ?></p>
-                                    <p class="m-0 text-secondary"><?php echo date('Y/m/d/ G:i',  strtotime($post_article->created)) ?></p>
+                                    <p class="m-0 text-secondary"><?php echo date('Y/m/d G:i',  strtotime($post_article->created)) ?></p>
                                 </div>
                                 <div class="col-12 mt-3"><h3 class="text-secondary"><?php echo $post_article->title ?></h3></div>
                             </div>
