@@ -56,6 +56,16 @@ class ArticlesController extends AppController
         // ユーザーデータ取得
         $user = $this->Users->findById($article->user_id)->first();
 
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+
+            if (isset($data['edit_article'])) {
+                // 編集内容保存ボタン押下の場合
+                $this->edit($data, $article_id);
+                $this->redirect($this->referer());
+            }
+        }
+
         $this->set(compact('article', 'user'));
     }
 
@@ -85,7 +95,7 @@ class ArticlesController extends AppController
             $data = array_merge(['user_id' => $this->auth_user->id], $this->request->getData());
 
             $dom = new DOMDocument;
-            $dom->loadHTML($data['text']);
+            $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
             $imgs = $dom->getElementsByTagName('img');
 
             if ($imgs->length != 0) {
@@ -100,7 +110,7 @@ class ArticlesController extends AppController
                 if ($imgs->length != 0) {
                     // imgタグが記事本文にある場合
                     // 記事画像を作成し、記事本文を更新する
-                    $this->createImageAndUpdateText($dom, $article);
+                    $this->createImageAndUpdateText($dom, $article, 'add');
                 }
 
                 return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
@@ -111,30 +121,111 @@ class ArticlesController extends AppController
     }
 
     /**
-     * 記事画像作成＆記事本文更新処理
+     * 記事編集処理
+     *
+     * @param array<string, string|int> $data
+     * @param int $article_id
      */
-    private function createImageAndUpdateText(DOMDocument $dom, \App\Model\Entity\Article $article) {
+    private function edit($data, $article_id) {
+        $article = $this->Articles->get($article_id);
+
+        $dom = new DOMDocument;
+        $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
+        $imgs = $dom->getElementsByTagName('img');
+
+        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+
+        if ($imgs->length == 0) {
+            // imgタグが記事本文にない場合
+            // そのまま更新する
+            $this->Articles->patchEntity($article, [
+                'title' => $data['title'],
+                'text' => $data['text'],
+            ]);
+            $this->Articles->save($article);
+
+            if (file_exists($img_dir_path)){
+                // 既存の記事画像がある場合はフォルダごと削除する
+                array_map('unlink', glob($img_dir_path. '/*.*'));
+                rmdir($img_dir_path);
+            }
+        } else {
+            // imgタグが記事本文にある場合
+            // 記事タイトルはそのまま更新し、記事本文はcreateImageAndUpdateText()で更新する
+            $this->Articles->patchEntity($article, ['title' => $data['title']]);
+            $this->createImageAndUpdateText($dom, $article, 'edit');
+        }
+    }
+
+    /**
+     * 記事画像作成＆記事本文更新処理
+     *
+     * @param DOMDocument $dom
+     * @param \App\Model\Entity\Article $dom
+     * @param string $mode
+     */
+    private function createImageAndUpdateText($dom, $article, $mode) {
         $article_id = $article->id;
         $imgs = $dom->getElementsByTagName('img');
+
+        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+        $img_dir_path_backup = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id ."_backup";
+
+        if ($mode == "edit" && file_exists($img_dir_path)) {
+            // 既存の記事画像が存在する場合
+
+            // 記事画像のバックアップ用フォルダ作成
+            mkdir($img_dir_path_backup, 0777);
+
+            // 記事画像フォルダの中身をバックアップ用フォルダにコピーする
+            if ($handle = opendir($img_dir_path)) {
+                while(false !== ($file = readdir($handle))) {
+                    if ($file != "." && $file != "..") {
+                        copy($img_dir_path . '/' . $file, $img_dir_path_backup . '/' . $file);
+                    }
+                }
+                closedir($handle);
+            }
+
+            // 記事画像フォルダの中身を削除する
+            array_map('unlink', glob($img_dir_path. '/*.*'));
+        } else if ($mode == 'add' || ($mode == "edit" && !file_exists($img_dir_path))) {
+            // 既存の記事画像が存在しない場合
+            // 記事画像保存用フォルダ作成
+            mkdir($img_dir_path, 0777);
+        }
 
         // 記事画像作成
         foreach ($imgs as $i => $img) {
             $src = $img->getAttribute('src');
+            $img_name = "";
 
-            // 画像データをデコード
-            $img_base64 = str_replace('base64,', '', strstr($src, 'base64,'));
-            $img_decode = base64_decode($img_base64);
+            if (strpos($src, 'data:image') !== false) {
+                // 新規追加画像の場合
 
-            // 画像保存パスを設定
-            $img_ext = str_replace('data:image/', '', strstr($src, ';base64,', true));
-            $img_name ="art". $article_id . "_img" . $i+1 . "." . $img_ext;
-            $img_path = UPLOAD_ARTICLE_IMG_PATH . $img_name;
+                // 画像データをデコード
+                $img_base64 = str_replace('base64,', '', strstr($src, 'base64,'));
+                $img_decode = base64_decode($img_base64);
 
-            // 画像を保存
-            file_put_contents($img_path, $img_decode);
+                // 画像保存パスを設定
+                $img_ext = str_replace('data:image/', '', strstr($src, ';base64,', true));
+                $img_name = "img_" . $i+1 . "." . $img_ext;
+                $img_path = $img_dir_path . "/" . $img_name;
+
+                // 画像を保存
+                file_put_contents($img_path, $img_decode);
+            } else {
+                // 既存画像の場合
+
+                // 改名して記事画像フォルダにコピーする
+                $src_path = $img_dir_path_backup . "/" . str_replace('/upload/article_img/article_' . $article_id . '/', '', strstr($src, '/upload'));
+                $img_ext = pathinfo($src_path, PATHINFO_EXTENSION);
+                $img_name = "img_" . $i+1 . "." . $img_ext;
+                copy($src_path, $img_dir_path . '/' . $img_name);
+            }
 
             // imgタグのsrcを画像保存パスに変更
-            $img->setAttribute('src', "/upload/article_img/". $img_name);
+            $img->setAttribute('src', '/upload/article_img/article_' . $article_id . '/' . $img_name);
         }
 
         // 元データに合わせて本文を調整
@@ -145,5 +236,11 @@ class ArticlesController extends AppController
         // 記事テーブルの本文を更新
         $this->Articles->patchEntity($article, ['text' => $text]);
         $this->Articles->save($article);
+
+        // バックアップ用フォルダを削除する
+        if ($mode == "edit" && file_exists($img_dir_path_backup)) {
+            array_map('unlink', glob($img_dir_path_backup. '/*.*'));
+            rmdir($img_dir_path_backup);
+        }
     }
 }

@@ -1,6 +1,7 @@
 var modal_title = document.getElementById("modal_title");
 var title_view = document.getElementById("title_view");
 var text_view = document.getElementById("text_view");
+var click_btn = "";
 
 // ツールバー機能の設定
 toolbarOptions = [
@@ -38,6 +39,13 @@ var quill = new Quill('#quill_editor', {
     theme: 'snow'
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+    $("#title").val(title_view.innerHTML);
+    $("#text").val(text_view.innerHTML);
+    modal_title.value = title_view.innerHTML;
+    quill.root.innerHTML = text_view.innerHTML;
+});
+
 function clickModalSave() {
     $("#title").val(modal_title.value);
     title_view.innerHTML = modal_title.value;
@@ -52,9 +60,22 @@ function clickModalClose() {
 }
 
 function clickSubmit() {
-    if (window.confirm("この内容で記事を投稿しますか？")) {
-        document.add_article_form.submit();
+    switch (click_btn) {
+        case "add_article":
+            return window.confirm("この内容で記事を投稿しますか？");
+        case "edit_article":
+            return window.confirm("この内容で記事を保存しますか？");
+        default:
+            return false;
     }
+}
+
+function clickAddArticle() {
+    click_btn = "add_article";
+}
+
+function clickEditArticle() {
+    click_btn = "edit_article";
 }
 
 function clickReturn(user_id) {
