@@ -11,16 +11,22 @@
 <div class="container-fluid">
     <?php if($hasAuth && $auth_user->id == $article->user_id): ?>
         <div class="row py-3 border-bottom">
-            <div class="col-6 pr-5 align-self-center d-flex justify-content-end">
+            <div class="col-4 d-flex align-self-center justify-content-end">
                 <button type="button" class="text-center" data-toggle="modal" data-target="#article_editor_modal">
-                    <img class="pb-2 rounded-circle icon" src="/img/article_create_icon.png" alt="save_icon">
+                    <img class="pb-2 rounded-circle icon" src="/img/article_create_icon.png" alt="create_icon">
                     <p class="m-0 text-secondary">記事を編集する</p>
                 </button>
             </div>
-            <div class="col-6 d-flex align-self-center justify-content-start">
+            <div class="col-4 d-flex align-self-center justify-content-center">
                 <button type='submit' name="edit_article" onclick="clickEditArticle()">
-                    <img class="pb-2 rounded-circle icon" src="/img/article_post_icon.png" alt="save_icon">
+                    <img class="pb-2 rounded-circle icon" src="/img/article_post_icon.png" alt="post_icon">
                     <p class="m-0 text-secondary">編集内容を保存する</p>
+                </button>
+            </div>
+            <div class="col-4 d-flex align-self-center justify-content-start">
+                <button type='submit' name="delete_article" onclick="clickDeleteArticle()">
+                    <img class="pb-2 rounded-circle icon" src="/img/article_delete_icon.png" alt="delete_icon">
+                    <p class="m-0 text-secondary">記事を削除する</p>
                 </button>
             </div>
         </div>

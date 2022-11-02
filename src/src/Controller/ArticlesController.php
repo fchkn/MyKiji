@@ -63,6 +63,9 @@ class ArticlesController extends AppController
                 // 編集内容保存ボタン押下の場合
                 $this->edit($data, $article_id);
                 $this->redirect($this->referer());
+            } else if (isset($data['delete_article'])) {
+                // 編集内容保存ボタン押下の場合
+                $this->delete($article_id);
             }
         }
 
@@ -155,6 +158,26 @@ class ArticlesController extends AppController
             $this->Articles->patchEntity($article, ['title' => $data['title']]);
             $this->createImageAndUpdateText($dom, $article, 'edit');
         }
+    }
+
+    /**
+     * 記事削除処理
+     *
+     * @param int $article_id
+     */
+    private function delete($article_id) {
+        $article = $this->Articles->get($article_id);
+        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+
+        // ユーザーデータを削除
+        if ($this->Articles->delete($article)) {
+            // 記事画像を削除
+            array_map('unlink', glob($img_dir_path . '/*.*'));
+            rmdir($img_dir_path);
+
+            return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
+        }
+        $this->Flash->error(__('記事を削除できませんでした。'));
     }
 
     /**

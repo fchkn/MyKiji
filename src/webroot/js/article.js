@@ -65,6 +65,8 @@ function clickSubmit() {
             return window.confirm("この内容で記事を投稿しますか？");
         case "edit_article":
             return window.confirm("この内容で記事を保存しますか？");
+        case "delete_article":
+            return window.confirm("本当に削除しますか？");
         default:
             return false;
     }
@@ -76,6 +78,10 @@ function clickAddArticle() {
 
 function clickEditArticle() {
     click_btn = "edit_article";
+}
+
+function clickDeleteArticle() {
+    click_btn = "delete_article";
 }
 
 function clickReturn(user_id) {
