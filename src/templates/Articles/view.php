@@ -9,6 +9,8 @@
 <form method="post" name="view_article_form" onSubmit="return clickSubmit()" style="height: 100%">
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
 <div class="container-fluid">
+
+    <!-- 記事編集・保存・削除ボタン -->
     <?php if($hasAuth && $auth_user->id == $article->user_id): ?>
         <div class="row py-3 border-bottom">
             <div class="col-4 d-flex align-self-center justify-content-end">
@@ -32,6 +34,7 @@
         </div>
     <?php endif; ?>
 
+    <!-- プロフィール画像・ユーザー名・投稿日・更新日 -->
     <div class="row pt-5 align-items-center">
         <div class="col-1">
             <button type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
@@ -44,11 +47,41 @@
         </div>
     </div>
 
-    <div class="row pt-4 pb-5">
-        <div class="col-12 mb-5">
+    <!-- 記事タイトル -->
+    <div class="row">
+        <div class="col-12 py-2">
             <input type="text" id="title" name="title" style="display:none"></input>
-            <h1 id ='title_view'><?php echo $article->title ?></h1>
+            <h1 class="m-0" id ='title_view'><?php echo $article->title ?></h1>
         </div>
+    </div>
+
+    <!-- お気に入りボタン -->
+    <div class="row">
+        <div class="col-12 pb-5">
+            <?php if(!$hasAuth): ?>
+                <abbr title="お気に入りに追加する場合はログインが必要です">
+                    <button type="button">
+                        <img class="icon-sm" src="/img/article_favorite_invalid_icon.png" id="favorite_img" alt="favorite_img">
+                    </button>
+                </abbr>
+            <?php elseif($hasAuth && $favorite_flg == 0): ?>
+                <abbr title="記事をお気に入りに追加する">
+                    <button type="button" onclick="clickFavorite(<?php echo $article->id ?>, <?php echo $auth_user->id ?>, 1)">
+                        <img class="icon-sm" src="/img/article_favorite_invalid_icon.png" id="favorite_img" alt="favorite_img">
+                    </button>
+                </abbr>
+            <?php elseif($hasAuth && $favorite_flg == 1): ?>
+                <abbr title="記事をお気に入りから外す">
+                    <button type="button" onclick="clickFavorite(<?php echo $article->id ?>, <?php echo $auth_user->id ?>, 0)">
+                        <img class="icon-sm" src="/img/article_favorite_enable_icon.png" id="favorite_img" alt="favorite_img">
+                    </button>
+                </abbr>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- 記事本文 -->
+    <div class="row">
         <div class="col-12 ql-container ql-snow">
             <textarea id="text" name="text" style="display:none"></textarea>
             <div class="ql-editor" id ='text_view'><?php echo $article->text ?></div>

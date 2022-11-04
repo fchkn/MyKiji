@@ -31,6 +31,7 @@ class ArticlesController extends AppController
         parent::initialize();
         $this->loadComponent('Paginator');
         $this->Users = TableRegistry::get('users');
+        $this->Favorites = TableRegistry::get('favorites');
     }
 
     /**
@@ -56,6 +57,21 @@ class ArticlesController extends AppController
         // ユーザーデータ取得
         $user = $this->Users->findById($article->user_id)->first();
 
+        // お気に入り登録の有無を確認
+        $favorite_flg = 0;
+        if ($this->hasAuth) {
+            $favorite = $this->Favorites->find()->where(['user_id' => $this->auth_user->id])->first();
+            $favorite_article_id_str = $favorite->article_id;
+            if(!empty($favorite_article_id_str)) {
+                $favorite_article_id_array = explode(',', $favorite_article_id_str);
+                foreach ($favorite_article_id_array as $favorite_article_id) {
+                    if ($favorite_article_id == $article_id) {
+                        $favorite_flg = 1;
+                    }
+                }
+            }
+        }
+
         if ($this->request->is('post')) {
             $data = $this->request->getData();
 
@@ -69,7 +85,7 @@ class ArticlesController extends AppController
             }
         }
 
-        $this->set(compact('article', 'user'));
+        $this->set(compact('article', 'user', 'favorite_flg'));
     }
 
     /**

@@ -84,8 +84,13 @@ function clickDeleteArticle() {
     click_btn = "delete_article";
 }
 
+function clickFavorite(article_id, user_id, favorite_flg) {
+    var parm = "article_id=" + article_id + "&user_id=" + user_id + "&favorite_flg=" + favorite_flg;
+    location.href = '/favorites/edit?' + parm;
+}
+
 function clickReturn(user_id) {
     if (window.confirm("記事内容を破棄してマイページに戻りますか？")) {
-        location.href='/users/view?user_id=' + user_id;
+        location.href = '/users/view?user_id=' + user_id;
     }
 }

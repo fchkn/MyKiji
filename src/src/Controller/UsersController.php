@@ -33,6 +33,7 @@ class UsersController extends AppController
         parent::initialize();
         $this->loadComponent('Paginator');
         $this->Articles = TableRegistry::get('articles');
+        $this->Favorites = TableRegistry::get('favorites');
     }
 
     /**
@@ -76,6 +77,11 @@ class UsersController extends AppController
             $user = $this->Users->newEmptyEntity();
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
+                // お気に入り記事テーブルを作成
+                $favorite = $this->Favorites->newEmptyEntity();
+                $this->Favorites->patchEntity($favorite, ['user_id' => $user->id]);
+                $this->Favorites->save($favorite);
+
                 // 認証設定してログイン状態にする
                 $this->Authentication->setIdentity($user);
 

@@ -2,6 +2,10 @@ img.icon {
     max-width:80px; max-width:80px; min-width:30px; min-height:30px;
 }
 
+img.icon-sm {
+    max-width:20px; max-width:20px; min-width:10px; min-height:10px;
+}
+
 button {
     background-color: transparent;
     border-style: none;
