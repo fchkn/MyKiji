@@ -9,6 +9,8 @@
 <form method="post" name="add_article_form" onSubmit="return clickSubmit()" style="height: 100%">
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
 <div class="container-fluid">
+
+    <!-- 記事編集・投稿ボタン -->
     <div class="row pt-5 border-bottom">
         <div class="col-6 pr-5 align-self-center d-flex justify-content-end">
             <button type="button" class="text-center" data-toggle="modal" data-target="#article_editor_modal">
@@ -27,17 +29,53 @@
         </div>
     </div>
 
-    <div class="row py-5">
-        <div class="col-12 mb-5">
+    <!-- 記事タイトル -->
+    <div class="row pt-5 pb-2">
+        <div class="col-12">
             <input type="text" id="title" name="title" style="display:none"></input>
             <h1 id ='title_view'></h1>
         </div>
+    </div>
+
+    <!-- 記事タグ -->
+    <div class="row pb-5">
+        <div class="col-12">
+            <span class="pr-1">
+                <input type="text" id="tag_1" name="tag_1" style="display:none">
+                <button type="button" class="mb-1 btn btn-secondary btn-sm" id ='tag_1_view' style="display:none" disabled></button>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_2" name="tag_2" style="display:none">
+                <button type="button" class="mb-1 btn btn-secondary btn-sm" id ='tag_2_view' style="display:none" disabled></button>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_3" name="tag_3" style="display:none">
+                <button type="button" class="mb-1 btn btn-secondary btn-sm" id ='tag_3_view' style="display:none" disabled></button>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_4" name="tag_4" style="display:none">
+                <button type="button" class="mb-1 btn btn-secondary btn-sm" id ='tag_4_view' style="display:none" disabled></button>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_5" name="tag_5" style="display:none">
+                <button type="button" class="mb-1 btn btn-secondary btn-sm" id ='tag_5_view' style="display:none" disabled></button>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_6" name="tag_6" style="display:none">
+                <button type="button" class="mb-1 btn btn-secondary btn-sm" id ='tag_6_view' style="display:none" disabled></button>
+            </span>
+        </div>
+    </div>
+
+    <!-- 記事本文 -->
+    <div class="row pb-5">
         <div class="col-12 ql-container ql-snow">
             <textarea id="text" name="text" style="display:none"></textarea>
             <div class="ql-editor" id ='text_view'></div>
         </div>
     </div>
 
+    <!-- 戻るボタン -->
     <div class="row py-5 border-top">
         <div class="col-12 my-4 align-self-center text-center">
             <input type="button" class="btn btn-secondary btn-lg" onclick="clickReturn(<?php echo $auth_user->id ?>)" value="Myページに戻る"/>

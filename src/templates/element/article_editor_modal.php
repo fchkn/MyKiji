@@ -9,9 +9,17 @@
                         </button>
                     </div>
                     <div class="row">
-                        <div class="modal-title w-100 mt-3">
+                        <div class="modal-title w-100 my-3">
                             <input type="text" class="form-control" placeholder="タイトルを入力してください" id="modal_title">
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class ="col-2 p-0"><input type="text" class="form-control form-control-sm" placeholder="タグ1" id="modal_tag_1"></div>
+                        <div class ="col-2 p-0"><input type="text" class="form-control form-control-sm" placeholder="タグ2" id="modal_tag_2"></div>
+                        <div class ="col-2 p-0"><input type="text" class="form-control form-control-sm" placeholder="タグ3" id="modal_tag_3"></div>
+                        <div class ="col-2 p-0"><input type="text" class="form-control form-control-sm" placeholder="タグ4" id="modal_tag_4"></div>
+                        <div class ="col-2 p-0"><input type="text" class="form-control form-control-sm" placeholder="タグ5" id="modal_tag_5"></div>
+                        <div class ="col-2 p-0"><input type="text" class="form-control form-control-sm" placeholder="タグ6" id="modal_tag_6"></div>
                     </div>
                 </div>
             </div>

@@ -12,6 +12,12 @@ use Cake\ORM\Entity;
  * @property int $user_id
  * @property string $title
  * @property string $text
+ * @property string|null $tag_1
+ * @property string|null $tag_2
+ * @property string|null $tag_3
+ * @property string|null $tag_4
+ * @property string|null $tag_5
+ * @property string|null $tag_6
  * @property \Cake\I18n\FrozenTime $created
  * @property \Cake\I18n\FrozenTime $modified
  *
@@ -32,6 +38,12 @@ class Article extends Entity
         'user_id' => true,
         'title' => true,
         'text' => true,
+        'tag_1' => true,
+        'tag_2' => true,
+        'tag_3' => true,
+        'tag_4' => true,
+        'tag_5' => true,
+        'tag_6' => true,
         'created' => true,
         'modified' => true,
         'user' => true,

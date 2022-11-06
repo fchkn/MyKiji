@@ -1,5 +1,17 @@
 var modal_title = document.getElementById("modal_title");
+var modal_tag_1 = document.getElementById("modal_tag_1");
+var modal_tag_2 = document.getElementById("modal_tag_2");
+var modal_tag_3 = document.getElementById("modal_tag_3");
+var modal_tag_4 = document.getElementById("modal_tag_4");
+var modal_tag_5 = document.getElementById("modal_tag_5");
+var modal_tag_6 = document.getElementById("modal_tag_6");
 var title_view = document.getElementById("title_view");
+var tag_1_view = document.getElementById("tag_1_view");
+var tag_2_view = document.getElementById("tag_2_view");
+var tag_3_view = document.getElementById("tag_3_view");
+var tag_4_view = document.getElementById("tag_4_view");
+var tag_5_view = document.getElementById("tag_5_view");
+var tag_6_view = document.getElementById("tag_6_view");
 var text_view = document.getElementById("text_view");
 var click_btn = "";
 
@@ -47,15 +59,46 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function clickModalSave() {
+    // 記事タイトルをプレビューに反映
     $("#title").val(modal_title.value);
     title_view.innerHTML = modal_title.value;
 
+    // 記事タグをプレビューに反映
+    var tags = Array.apply(null, Array(6));
+    var tag_i = 0;
+    for (var i = 1; i <= 6; i++) {
+        var tag = eval("modal_tag_" + i).value;
+        if (tag && !tags.includes(tag)) {
+            tags[tag_i] = tag;
+            tag_i++;
+        }
+    }
+    tags.forEach(function(tag, i) {
+        tag_num = i + 1;
+        tag = tag ?? "";
+        if (tag == "") {
+            eval("tag_" + tag_num + "_view").style.display ="none";
+        } else {
+            eval("tag_" + tag_num + "_view").style.display ="inline-block";
+        }
+        $("#tag_" + tag_num).val(tag);
+        eval("tag_" + tag_num + "_view").innerHTML = tag;
+        eval("modal_tag_" + tag_num).value = tag;
+    })
+
+    // 記事本文をプレビューに反映
     $("#text").val(quill.root.innerHTML);
     text_view.innerHTML = quill.root.innerHTML;
 }
 
 function clickModalClose() {
     modal_title.value = title_view.innerHTML;
+    modal_tag_1.value = tag_1_view.innerHTML;
+    modal_tag_2.value = tag_2_view.innerHTML;
+    modal_tag_3.value = tag_3_view.innerHTML;
+    modal_tag_4.value = tag_4_view.innerHTML;
+    modal_tag_5.value = tag_5_view.innerHTML;
+    modal_tag_6.value = tag_6_view.innerHTML;
     quill.root.innerHTML = text_view.innerHTML;
 }
 
