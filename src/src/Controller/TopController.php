@@ -37,6 +37,8 @@ class TopController extends AppController
             'limit' => 10,
         ])->toArray();
 
-        $this->set(compact('latest_articles'));
+        $hasPaginator = false;
+
+        $this->set(compact('latest_articles', 'hasPaginator'));
     }
 }
