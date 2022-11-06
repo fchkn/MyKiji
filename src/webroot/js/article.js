@@ -55,6 +55,13 @@ document.addEventListener("DOMContentLoaded", function() {
     $("#title").val(title_view.innerHTML);
     $("#text").val(text_view.innerHTML);
     modal_title.value = title_view.innerHTML;
+    modal_title.value = title_view.innerHTML;
+    modal_tag_1.value = tag_1_view.innerHTML;
+    modal_tag_2.value = tag_2_view.innerHTML;
+    modal_tag_3.value = tag_3_view.innerHTML;
+    modal_tag_4.value = tag_4_view.innerHTML;
+    modal_tag_5.value = tag_5_view.innerHTML;
+    modal_tag_6.value = tag_6_view.innerHTML;
     quill.root.innerHTML = text_view.innerHTML;
 });
 

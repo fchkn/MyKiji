@@ -34,30 +34,18 @@
         </div>
     <?php endif; ?>
 
-    <!-- プロフィール画像・ユーザー名・投稿日・更新日 -->
+    <!-- プロフィール画像・ユーザー名・投稿日・更新日・お気に入りボタン -->
     <div class="row pt-5 align-items-center">
         <div class="col-1">
             <button type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
                 <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img">
             </button>
         </div>
-        <div class="col-11">
+        <div class="col-10">
             <p class="m-0 text-secondary"><?php echo $user->name ?></p>
             <p class="m-0 text-secondary">投稿日: <?php echo date('Y/m/d G:i',  strtotime($article->created)) ?>&emsp;更新日: <?php echo date('Y/m/d G:i',  strtotime($article->modified)) ?></p>
         </div>
-    </div>
-
-    <!-- 記事タイトル -->
-    <div class="row">
-        <div class="col-12 py-2">
-            <input type="text" id="title" name="title" style="display:none"></input>
-            <h1 class="m-0" id ='title_view'><?php echo $article->title ?></h1>
-        </div>
-    </div>
-
-    <!-- お気に入りボタン -->
-    <div class="row">
-        <div class="col-12 pb-5">
+        <div class ="col-1 p-0">
             <?php if(!$hasAuth): ?>
                 <abbr title="お気に入りに追加する場合はログインが必要です">
                     <button type="button">
@@ -80,8 +68,70 @@
         </div>
     </div>
 
+    <!-- 記事タイトル -->
+    <div class="row py-3">
+        <div class="col-12">
+            <input type="text" id="title" name="title" style="display:none"></input>
+            <h1 class="m-0" id ='title_view'><?php echo $article->title ?></h1>
+        </div>
+    </div>
+
+    <!-- 記事タグ -->
+    <div class="row pb-5">
+        <div class="col-12">
+            <span class="pr-1">
+                <input type="text" id="tag_1" name="tag_1" style="display:none">
+                <?php if (!empty($article->tag_1)): ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_1_view"><?php echo $article->tag_1 ?></button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_1_view" style="display:none"></button>
+                <?php endif; ?>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_2" name="tag_2" style="display:none">
+                <?php if (!empty($article->tag_2)): ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_2_view"><?php echo $article->tag_2 ?></button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_2_view" style="display:none"></button>
+                <?php endif; ?>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_3" name="tag_3" style="display:none">
+                <?php if (!empty($article->tag_3)): ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_3_view"><?php echo $article->tag_3 ?></button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_3_view" style="display:none"></button>
+                <?php endif; ?>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_4" name="tag_4" style="display:none">
+                <?php if (!empty($article->tag_4)): ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_4_view"><?php echo $article->tag_4 ?></button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_4_view" style="display:none"></button>
+                <?php endif; ?>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_5" name="tag_5" style="display:none">
+                <?php if (!empty($article->tag_5)): ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_5_view"><?php echo $article->tag_5 ?></button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_5_view" style="display:none"></button>
+                <?php endif; ?>
+            </span>
+            <span class="pr-1">
+                <input type="text" id="tag_6" name="tag_6" style="display:none">
+                <?php if (!empty($article->tag_6)): ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_6_view"><?php echo $article->tag_6 ?></button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_6_view" style="display:none"></button>
+                <?php endif; ?>
+            </span>
+        </div>
+    </div>
+
     <!-- 記事本文 -->
-    <div class="row">
+    <div class="row pb-5">
         <div class="col-12 ql-container ql-snow">
             <textarea id="text" name="text" style="display:none"></textarea>
             <div class="ql-editor" id ='text_view'><?php echo $article->text ?></div>

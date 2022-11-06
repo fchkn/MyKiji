@@ -160,6 +160,12 @@ class ArticlesController extends AppController
             $this->Articles->patchEntity($article, [
                 'title' => $data['title'],
                 'text' => $data['text'],
+                'tag_1' => $data['tag_1'],
+                'tag_2' => $data['tag_2'],
+                'tag_3' => $data['tag_3'],
+                'tag_4' => $data['tag_4'],
+                'tag_5' => $data['tag_5'],
+                'tag_6' => $data['tag_6'],
             ]);
             $this->Articles->save($article);
 
@@ -171,7 +177,15 @@ class ArticlesController extends AppController
         } else {
             // imgタグが記事本文にある場合
             // 記事タイトルはそのまま更新し、記事本文はcreateImageAndUpdateText()で更新する
-            $this->Articles->patchEntity($article, ['title' => $data['title']]);
+            $this->Articles->patchEntity($article, [
+                'title' => $data['title'],
+                'tag_1' => $data['tag_1'],
+                'tag_2' => $data['tag_2'],
+                'tag_3' => $data['tag_3'],
+                'tag_4' => $data['tag_4'],
+                'tag_5' => $data['tag_5'],
+                'tag_6' => $data['tag_6'],
+            ]);
             $this->createImageAndUpdateText($dom, $article, 'edit');
         }
     }
