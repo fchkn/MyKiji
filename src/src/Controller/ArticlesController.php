@@ -99,9 +99,11 @@ class ArticlesController extends AppController
             'conditions' => ['Articles.title LIKE' => '%' . $search_word . '%'],
             'contain' => ['Users'],
             'order' => ['Articles.created' => 'desc'],
-        ]));
+        ]))->toArray();
 
-        $this->set(compact('search_word', 'search_articles'));
+        $hasPaginator = true;
+
+        $this->set(compact('search_word', 'search_articles', 'hasPaginator'));
     }
 
     /**
