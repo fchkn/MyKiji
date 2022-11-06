@@ -82,49 +82,49 @@
             <span class="pr-1">
                 <input type="text" id="tag_1" name="tag_1" style="display:none">
                 <?php if (!empty($article->tag_1)): ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_1_view"><?php echo $article->tag_1 ?></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_1_view"><?php echo $article->tag_1 ?></button>
                 <?php else: ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_1_view" style="display:none"></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_1_view" style="display:none"></button>
                 <?php endif; ?>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_2" name="tag_2" style="display:none">
                 <?php if (!empty($article->tag_2)): ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_2_view"><?php echo $article->tag_2 ?></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_2_view"><?php echo $article->tag_2 ?></button>
                 <?php else: ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_2_view" style="display:none"></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_2_view" style="display:none"></button>
                 <?php endif; ?>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_3" name="tag_3" style="display:none">
                 <?php if (!empty($article->tag_3)): ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_3_view"><?php echo $article->tag_3 ?></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_3_view"><?php echo $article->tag_3 ?></button>
                 <?php else: ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_3_view" style="display:none"></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_3_view" style="display:none"></button>
                 <?php endif; ?>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_4" name="tag_4" style="display:none">
                 <?php if (!empty($article->tag_4)): ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_4_view"><?php echo $article->tag_4 ?></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_4_view"><?php echo $article->tag_4 ?></button>
                 <?php else: ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_4_view" style="display:none"></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_4_view" style="display:none"></button>
                 <?php endif; ?>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_5" name="tag_5" style="display:none">
                 <?php if (!empty($article->tag_5)): ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_5_view"><?php echo $article->tag_5 ?></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_5_view"><?php echo $article->tag_5 ?></button>
                 <?php else: ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_5_view" style="display:none"></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_5_view" style="display:none"></button>
                 <?php endif; ?>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_6" name="tag_6" style="display:none">
                 <?php if (!empty($article->tag_6)): ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_6_view"><?php echo $article->tag_6 ?></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_6_view"><?php echo $article->tag_6 ?></button>
                 <?php else: ?>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_6_view" style="display:none"></button>
+                    <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_6_view" style="display:none"></button>
                 <?php endif; ?>
             </span>
         </div>

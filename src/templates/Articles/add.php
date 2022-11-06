@@ -42,27 +42,27 @@
         <div class="col-12">
             <span class="pr-1">
                 <input type="text" id="tag_1" name="tag_1" style="display:none">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_1_view" style="display:none" disabled></button>
+                <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_1_view" style="display:none" disabled></button>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_2" name="tag_2" style="display:none">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_2_view" style="display:none" disabled></button>
+                <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_2_view" style="display:none" disabled></button>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_3" name="tag_3" style="display:none">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_3_view" style="display:none" disabled></button>
+                <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_3_view" style="display:none" disabled></button>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_4" name="tag_4" style="display:none">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_4_view" style="display:none" disabled></button>
+                <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_4_view" style="display:none" disabled></button>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_5" name="tag_5" style="display:none">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_5_view" style="display:none" disabled></button>
+                <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_5_view" style="display:none" disabled></button>
             </span>
             <span class="pr-1">
                 <input type="text" id="tag_6" name="tag_6" style="display:none">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id ="tag_6_view" style="display:none" disabled></button>
+                <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_6_view" style="display:none" disabled></button>
             </span>
         </div>
     </div>

@@ -44,7 +44,9 @@
                     <?php if (empty($post_articles)): ?>
                         <h3 class="text-center text-secondary">投稿記事はありません</h3>
                     <?php else: ?>
-                        <?= $this->element('article_list', ["articles" => $post_articles]) ?>
+                        <div class="row justify-content-center">
+                            <?= $this->element('article_list', ["articles" => $post_articles]) ?>
+                        </div>
                     <?php endif; ?>
                 </div>
                 <!-- お気に入り記事 -->

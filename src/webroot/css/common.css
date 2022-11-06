@@ -14,12 +14,25 @@ main {
 }
 
 .userimg-article {
-    min-height:40px;
-    min-width:40px;
+    max-height:40px;
+    max-width:40px;
+}
+
+.userimg-article-btn {
+    background-color: transparent;
+    border-style: none;
+}
+
+.userimg-article-btn:focus {
+    outline: none;
 }
 
 .page-link:focus {
     z-index: 3;
     outline: 0;
     box-shadow: 0 0 0 0.2rem #e4e3e3;
+}
+
+.list-group {
+    width:800px;
 }
