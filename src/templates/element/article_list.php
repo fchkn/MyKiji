@@ -17,28 +17,17 @@
                 </div>
                 <div class="col-12 px-4 pt-2 pb-3">
                     <!-- 記事タイトル -->
-                    <a class="text-secondary h3" href="/articles/view?article_id=<?php echo $article->id?>"><?php echo $article->title ?></a>
+                    <a class="text-secondary h3" href="/articles/view?article_id=<?php echo $article->id ?>"><?php echo $article->title ?></a>
                 </div>
                 <div class="col-12 px-4">
                     <!-- 記事タグ -->
-                    <?php if (!empty($article->tag_1)): ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm"><?php echo $article->tag_1 ?></button>
-                    <?php endif; ?>
-                    <?php if (!empty($article->tag_2)): ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm"><?php echo $article->tag_2 ?></button>
-                    <?php endif; ?>
-                    <?php if (!empty($article->tag_3)): ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm"><?php echo $article->tag_3 ?></button>
-                    <?php endif; ?>
-                    <?php if (!empty($article->tag_4)): ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm"><?php echo $article->tag_4 ?></button>
-                    <?php endif; ?>
-                    <?php if (!empty($article->tag_5)): ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm"><?php echo $article->tag_5 ?></button>
-                    <?php endif; ?>
-                    <?php if (!empty($article->tag_6)): ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm"><?php echo $article->tag_6 ?></button>
-                    <?php endif; ?>
+                    <?php for ($i = 1; $i <= 6; $i++) : ?>
+                        <?php if (!empty($article->{"tag_" . $i})): ?>
+                            <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" onclick="location.href='/articles/search?tag=<?php echo $article->{'tag_' . $i} ?>'">
+                                <?php echo $article->{"tag_" . $i} ?>
+                            </button>
+                        <?php endif; ?>
+                    <?php endfor; ?>
                 </div>
             </div>
         </div>

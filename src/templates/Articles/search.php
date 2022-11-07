@@ -8,12 +8,12 @@
 <?= $this->Flash->render() ?>
 <div class="container-fluid h-100">
     <div class="row pt-5 justify-content-center align-items-center">
-        <span class="text-secondary">検索ワード:&nbsp</span>
-        <b class ="text-secondary"><?php echo $search_word ?></b>
+        <span class="text-secondary">検索<?php echo $target ?>:&nbsp</span>
+        <b class ="text-secondary"><?php echo $search ?></b>
     </div>
     <div class="row py-5 justify-content-center">
         <?php if (empty($search_articles)): ?>
-            <h3 class="text-center text-secondary pb-5">検索ワードに一致する記事はありませんでした</h3>
+            <h3 class="text-center text-secondary pb-5">検索<?php echo $target ?>に一致する記事はありませんでした</h3>
         <?php else: ?>
             <?= $this->element('article_list', ["articles" => $search_articles]) ?>
         <?php endif; ?>

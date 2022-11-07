@@ -31,7 +31,7 @@ var search_box = document.getElementById( "search_box" );
 
 search_box.onkeypress = function(e){
     if (e.key === 'Enter' && search_box.value) {
-        location.href = "/articles/search?q=" + search_box.value;
+        location.href = "/articles/search?word=" + search_box.value;
     }
 };
 </script>

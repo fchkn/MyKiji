@@ -92,18 +92,52 @@ class ArticlesController extends AppController
      * 記事検索処理
      */
     public function search() {
-        $search_word = $this->request->getQuery('q');
+        $q = $this->request->getQuery();
+        $target = "";
+        $search = "";
+        $search_articles = [];
 
-        // 検索記事データ取得
-        $search_articles = $this->paginate($this->Articles->find('all', [
-            'conditions' => ['Articles.title LIKE' => '%' . $search_word . '%'],
-            'contain' => ['Users'],
-            'order' => ['Articles.created' => 'desc'],
-        ]))->toArray();
+        if (!empty($q['word'])) {
+            // 検索バーから検索の場合
+            $target = "ワード";
+            $search = $q['word'];
+            $search_articles = $this->paginate($this->Articles->find('all', [
+                'conditions' => ['OR' => [
+                    'Articles.title LIKE' => '%' . $search . '%',
+                    'Articles.tag_1' => $search,
+                    'Articles.tag_2' => $search,
+                    'Articles.tag_3' => $search,
+                    'Articles.tag_4' => $search,
+                    'Articles.tag_5' => $search,
+                    'Articles.tag_6' => $search,
+                ]],
+                'contain' => ['Users'],
+                'order' => ['Articles.created' => 'desc'],
+            ]))->toArray();
+        } else if (!empty($q['tag'])) {
+            // タグから検索の場合
+            $target = "タグ";
+            $search = $q['tag'];
+            $search_articles = $this->paginate($this->Articles->find('all', [
+                'conditions' => ['OR' => [
+                    'Articles.tag_1' => $search,
+                    'Articles.tag_2' => $search,
+                    'Articles.tag_3' => $search,
+                    'Articles.tag_4' => $search,
+                    'Articles.tag_5' => $search,
+                    'Articles.tag_6' => $search,
+                ]],
+                'contain' => ['Users'],
+                'order' => ['Articles.created' => 'desc'],
+            ]))->toArray();
+        } else {
+            // クエリパラメータが存在しない場合はトップ画面に遷移させる
+            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+        }
 
         $hasPaginator = true;
 
-        $this->set(compact('search_word', 'search_articles', 'hasPaginator'));
+        $this->set(compact('target', 'search', 'search_articles', 'hasPaginator'));
     }
 
     /**
