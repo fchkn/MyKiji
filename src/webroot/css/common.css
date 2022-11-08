@@ -18,12 +18,12 @@ main {
     max-width:40px;
 }
 
-.userimg-article-btn {
+.icon-btn {
     background-color: transparent;
     border-style: none;
 }
 
-.userimg-article-btn:focus {
+.icon-btn:focus {
     outline: none;
 }
 

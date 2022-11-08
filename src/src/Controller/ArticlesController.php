@@ -96,10 +96,16 @@ class ArticlesController extends AppController
         $target = "";
         $search = "";
         $search_articles = [];
+        $order = "desc";
+
+        if (!empty($q['order']) && $q['order'] == "asc") {
+            // 昇順でソートの場合
+            $order = "asc";
+        }
 
         if (!empty($q['word'])) {
             // 検索バーから検索の場合
-            $target = "ワード";
+            $target = "word";
             $search = $q['word'];
             $search_articles = $this->paginate($this->Articles->find('all', [
                 'conditions' => ['OR' => [
@@ -112,11 +118,11 @@ class ArticlesController extends AppController
                     'Articles.tag_6' => $search,
                 ]],
                 'contain' => ['Users'],
-                'order' => ['Articles.created' => 'desc'],
+                'order' => ['Articles.created' => $order],
             ]))->toArray();
         } else if (!empty($q['tag'])) {
             // タグから検索の場合
-            $target = "タグ";
+            $target = "tag";
             $search = $q['tag'];
             $search_articles = $this->paginate($this->Articles->find('all', [
                 'conditions' => ['OR' => [
@@ -128,7 +134,7 @@ class ArticlesController extends AppController
                     'Articles.tag_6' => $search,
                 ]],
                 'contain' => ['Users'],
-                'order' => ['Articles.created' => 'desc'],
+                'order' => ['Articles.created' => $order],
             ]))->toArray();
         } else {
             // クエリパラメータが存在しない場合はトップ画面に遷移させる
@@ -137,7 +143,7 @@ class ArticlesController extends AppController
 
         $hasPaginator = true;
 
-        $this->set(compact('target', 'search', 'search_articles', 'hasPaginator'));
+        $this->set(compact('target', 'search', 'search_articles', 'order' ,'hasPaginator'));
     }
 
     /**
