@@ -262,13 +262,13 @@ class ArticlesController extends AppController
     private function createImageAndUpdateText($dom, $article, $mode) {
         $article_id = $article->id;
         $imgs = $dom->getElementsByTagName('img');
+        $img_param = date('YmdHis');
 
         $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
         $img_dir_path_backup = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id ."_backup";
 
         if ($mode == "edit" && file_exists($img_dir_path)) {
             // 既存の記事画像が存在する場合
-
             // 記事画像のバックアップ用フォルダ作成
             mkdir($img_dir_path_backup, 0777);
 
@@ -297,7 +297,6 @@ class ArticlesController extends AppController
 
             if (strpos($src, 'data:image') !== false) {
                 // 新規追加画像の場合
-
                 // 画像データをデコード
                 $img_base64 = str_replace('base64,', '', strstr($src, 'base64,'));
                 $img_decode = base64_decode($img_base64);
@@ -311,16 +310,20 @@ class ArticlesController extends AppController
                 file_put_contents($img_path, $img_decode);
             } else {
                 // 既存画像の場合
+                // 既存ファイル名を取得
+                $old_img_name_include_param = str_replace('/upload/article_img/article_' . $article_id . '/', '', strstr($src, '/upload'));
+                $old_img_name = strstr($old_img_name_include_param, '?', true);
 
                 // 改名して記事画像フォルダにコピーする
-                $src_path = $img_dir_path_backup . "/" . str_replace('/upload/article_img/article_' . $article_id . '/', '', strstr($src, '/upload'));
+                $src_path = $img_dir_path_backup . "/" . $old_img_name;
                 $img_ext = pathinfo($src_path, PATHINFO_EXTENSION);
                 $img_name = "img_" . $i+1 . "." . $img_ext;
                 copy($src_path, $img_dir_path . '/' . $img_name);
             }
 
             // imgタグのsrcを画像保存パスに変更
-            $img->setAttribute('src', '/upload/article_img/article_' . $article_id . '/' . $img_name);
+            // ※キャッシュ回避用にパラメータを付与
+            $img->setAttribute('src', '/upload/article_img/article_' . $article_id . '/' . $img_name . '?'. $img_param);
         }
 
         // 元データに合わせて本文を調整
