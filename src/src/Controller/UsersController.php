@@ -58,9 +58,6 @@ class UsersController extends AppController
         }
 
         // 投稿記事データ取得
-        //$post_articles = $this->paginate($this->Articles->find()->where(['user_id' => $user_id])->order(['created' => 'desc']));
-
-        // 投稿記事データ取得
         $post_articles = $this->paginate($this->Articles->find('all', [
             'conditions' => ['articles.user_id' => $user_id],
             'contain' => ['Users'],

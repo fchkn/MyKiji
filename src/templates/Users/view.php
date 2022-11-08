@@ -61,3 +61,16 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    var param = location.search;
+    if (param.match('redirect=articles_add')) {
+        // 記事追加処理からリダイレクトされた場合
+        alert('記事を投稿しました');
+    } else if (param.match('redirect=articles_delete')) {
+        // 記事削除処理からリダイレクトされた場合
+        alert('記事を削除しました');
+    }
+});
+</script>

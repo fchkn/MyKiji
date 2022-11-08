@@ -78,7 +78,7 @@ class ArticlesController extends AppController
             if (isset($data['edit_article'])) {
                 // 編集内容保存ボタン押下の場合
                 $this->edit($data, $article_id);
-                $this->redirect($this->referer());
+                $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id . '&redirect=articles_edit']);
             } else if (isset($data['delete_article'])) {
                 // 編集内容保存ボタン押下の場合
                 $this->delete($article_id);
@@ -168,7 +168,7 @@ class ArticlesController extends AppController
                     $this->createImageAndUpdateText($dom, $article, 'add');
                 }
 
-                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
+                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_add']);
             }
 
             $this->Flash->error(__('記事追加に失敗しました'));
@@ -241,7 +241,7 @@ class ArticlesController extends AppController
             array_map('unlink', glob($img_dir_path . '/*.*'));
             rmdir($img_dir_path);
 
-            return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
+            return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_delete']);
         }
         $this->Flash->error(__('記事を削除できませんでした。'));
     }
