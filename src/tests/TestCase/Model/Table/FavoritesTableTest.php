@@ -26,7 +26,6 @@ class FavoritesTableTest extends TestCase
     protected $fixtures = [
         'app.Favorites',
         'app.Users',
-        'app.Articles',
     ];
 
     /**

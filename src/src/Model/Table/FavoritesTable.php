@@ -12,7 +12,6 @@ use Cake\Validation\Validator;
  * Favorites Model
  *
  * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
- * @property \App\Model\Table\ArticlesTable&\Cake\ORM\Association\BelongsTo $Articles
  *
  * @method \App\Model\Entity\Favorite newEmptyEntity()
  * @method \App\Model\Entity\Favorite newEntity(array $data, array $options = [])
@@ -52,6 +51,10 @@ class FavoritesTable extends Table
             'foreignKey' => 'user_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('Articles', [
+            'foreignKey' => 'article_id',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**
@@ -67,9 +70,8 @@ class FavoritesTable extends Table
             ->notEmptyString('user_id');
 
         $validator
-            ->scalar('article_id')
-            ->maxLength('article_id', 1024)
-            ->allowEmptyString('article_id');
+            ->nonNegativeInteger('article_id')
+            ->notEmptyString('article_id');
 
         return $validator;
     }
@@ -84,6 +86,7 @@ class FavoritesTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
+        $rules->add($rules->existsIn('article_id', 'Articles'), ['errorField' => 'article_id']);
 
         return $rules;
     }

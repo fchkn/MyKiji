@@ -21,9 +21,9 @@ class FavoritesFixture extends TestFixture
             [
                 'id' => 1,
                 'user_id' => 1,
-                'article_id' => 'Lorem ipsum dolor sit amet',
-                'created' => '2022-11-03 13:19:55',
-                'modified' => '2022-11-03 13:19:55',
+                'article_id' => 1,
+                'created' => '2022-11-09 15:41:30',
+                'modified' => '2022-11-09 15:41:30',
             ],
         ];
         parent::init();

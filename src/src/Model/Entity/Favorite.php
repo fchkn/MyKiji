@@ -10,12 +10,11 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property int $user_id
- * @property string|null $article_id
+ * @property int $article_id
  * @property \Cake\I18n\FrozenTime $created
  * @property \Cake\I18n\FrozenTime $modified
  *
  * @property \App\Model\Entity\User $user
- * @property \App\Model\Entity\Article $article
  */
 class Favorite extends Entity
 {
@@ -34,6 +33,5 @@ class Favorite extends Entity
         'created' => true,
         'modified' => true,
         'user' => true,
-        'article' => true,
     ];
 }
