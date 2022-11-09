@@ -36,11 +36,20 @@
         <!-- ページネーション要素 -->
         <ul class="mt-5 pagination justify-content-center">
             <?= $this->Paginator->prev('<') ?>
-            <?= $this->Paginator->numbers([
-                'first' => 1,
-                'modulus' => 2,
-                'last' => 1
-            ]) ?>
+            <?php if (!empty($model)): ?>
+                <?= $this->Paginator->numbers([
+                    'first' => 1,
+                    'modulus' => 2,
+                    'last' => 1,
+                    'model' => $model
+                ]) ?>
+            <?php else: ?>
+                <?= $this->Paginator->numbers([
+                    'first' => 1,
+                    'modulus' => 2,
+                    'last' => 1,
+                ]) ?>
+            <?php endif; ?>
             <?= $this->Paginator->next('>') ?>
         </ul>
     <?php endif; ?>

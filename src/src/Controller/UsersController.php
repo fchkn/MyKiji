@@ -33,6 +33,7 @@ class UsersController extends AppController
         parent::initialize();
         $this->loadComponent('Paginator');
         $this->Articles = TableRegistry::get('articles');
+        $this->Favorites = TableRegistry::get('favorites');
     }
 
     /**
@@ -42,6 +43,7 @@ class UsersController extends AppController
         $user_id = $this->request->getQuery('user_id');
         $user = null;
         $isMypage = false;
+        $tmpAlias = $this->Articles->getAlias();
 
         // ユーザーデータ取得
         if (!empty($user_id) && is_numeric($user_id)) {
@@ -57,12 +59,36 @@ class UsersController extends AppController
         }
 
         // 投稿記事データ取得
-        $post_articles = $this->paginate($this->Articles->find('all', [
-            'conditions' => ['articles.user_id' => $user_id],
+        $post_articles = $this->paginate($this->Articles->setAlias('post_articles')->find('all', [
+            'conditions' => ['post_articles.user_id' => $user_id],
             'contain' => ['Users'],
-            'order' => ['articles.created' => 'desc'],
-        ]))->toArray();
+            'order' => ['post_articles.created' => 'desc'],
+        ]), ['scope' => 'post_articles'])->toArray();
 
+        $this->set(compact('post_articles'));
+
+        // お気に入り記事データ取得
+        $favorite_articles = [];
+        $favorites = $this->Favorites->find('all', [
+            'conditions' => ['favorites.user_id' => $user_id],
+        ])->toArray();
+        if (!empty($favorites)) {
+            $condition = [];
+            foreach ($favorites as $favorite) {
+                $condition[] = ['favorite_articles.id' => $favorite->article_id];
+            }
+            $favorite_articles = $this->paginate($this->Articles->setAlias('favorite_articles')->find('all', [
+                'conditions' => ['OR' => $condition],
+                'contain' => ['Users'],
+            ]), ['scope' => 'favorite_articles'])->toArray();
+        }
+
+        $this->set(compact('favorite_articles'));
+
+        //エイリアス名を元に戻す
+        $this->Articles->setAlias($tmpAlias);
+
+        // ページネーション要否
         $hasPaginator = true;
 
         // マイページ判定
@@ -214,6 +240,9 @@ class UsersController extends AppController
 
     /**
      * プロフィール画像保存処理
+     *
+     * @param LaminasDiactorosUploadedFile $profile_img
+     * @param int $user_id
      */
     private function saveProfileImg($profile_img, $user_id)
     {

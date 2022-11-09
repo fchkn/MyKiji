@@ -45,13 +45,19 @@
                         <h3 class="text-center text-secondary">投稿記事はありません</h3>
                     <?php else: ?>
                         <div class="row justify-content-center">
-                            <?= $this->element('article_list', ["articles" => $post_articles]) ?>
+                            <?= $this->element('article_list', ['articles' => $post_articles, 'model' => 'post_articles']) ?>
                         </div>
                     <?php endif; ?>
                 </div>
                 <!-- お気に入り記事 -->
                 <div class="tab-pane fade" id="fav_article">
-                    <div>お気に入り記事</div>
+                    <?php if (empty($favorite_articles)): ?>
+                        <h3 class="text-center text-secondary">お気に入り記事はありません</h3>
+                    <?php else: ?>
+                        <div class="row justify-content-center">
+                            <?= $this->element('article_list', ['articles' => $favorite_articles, 'model' => 'favorite_articles']) ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <!-- フォロー -->
                 <div class="tab-pane fade" id="follow">

@@ -34,7 +34,7 @@
                 <?php endif; ?>
             </div>
             <!-- 記事リスト -->
-            <?= $this->element('article_list', ["articles" => $search_articles]) ?>
+            <?= $this->element('article_list', ['articles' => $search_articles, 'model' => '']) ?>
         <?php endif; ?>
     </div>
 </div>
