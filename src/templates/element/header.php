@@ -3,7 +3,7 @@
         <div class="col-1"></div>
         <div class="col-2 align-self-center"><h1><a href="<?= $this->Url->build('/') ?>">MyKiji</a></h1><?php $hasAuth ?></div>
         <div class="col-1"></div>
-        <div class="col-4 align-self-center text-center"><input type="text" class="form-control" placeholder="キーワードで検索"></div>
+        <div class="col-4 align-self-center text-center"><input type="text" class="form-control" id="search_box" onkeypress="redirectSearch()" placeholder="記事を検索"></div>
         <div class="col-1"></div>
         <?php if($hasAuth): ?>
             <div class="col-3 align-self-center text-left">
@@ -25,3 +25,13 @@
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+var search_box = document.getElementById( "search_box" );
+
+search_box.onkeypress = function(e){
+    if (e.key === 'Enter' && search_box.value) {
+        location.href = "/articles/search?word=" + search_box.value;
+    }
+};
+</script>

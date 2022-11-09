@@ -12,3 +12,27 @@ main {
     background: #f5f5f5;
     border: solid 30px #f5f5f5;
 }
+
+.userimg-article {
+    max-height:40px;
+    max-width:40px;
+}
+
+.icon-btn {
+    background-color: transparent;
+    border-style: none;
+}
+
+.icon-btn:focus {
+    outline: none;
+}
+
+.page-link:focus {
+    z-index: 3;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem #e4e3e3;
+}
+
+.list-group {
+    width:800px;
+}

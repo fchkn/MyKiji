@@ -51,6 +51,9 @@ class ArticlesTable extends Table
             'foreignKey' => 'user_id',
             'joinType' => 'INNER',
         ]);
+        $this->hasMany('Favorites', [
+            'foreignKey' => 'article_id',
+        ]);
     }
 
     /**
@@ -76,6 +79,36 @@ class ArticlesTable extends Table
             ->maxLength('text', 4294967295)
             ->requirePresence('text', 'create')
             ->notEmptyString('text');
+
+        $validator
+            ->scalar('tag_1')
+            ->maxLength('tag_1', 255)
+            ->allowEmptyString('tag_1');
+
+        $validator
+            ->scalar('tag_2')
+            ->maxLength('tag_2', 255)
+            ->allowEmptyString('tag_2');
+
+        $validator
+            ->scalar('tag_3')
+            ->maxLength('tag_3', 255)
+            ->allowEmptyString('tag_3');
+
+        $validator
+            ->scalar('tag_4')
+            ->maxLength('tag_4', 255)
+            ->allowEmptyString('tag_4');
+
+        $validator
+            ->scalar('tag_5')
+            ->maxLength('tag_5', 255)
+            ->allowEmptyString('tag_5');
+
+        $validator
+            ->scalar('tag_6')
+            ->maxLength('tag_6', 255)
+            ->allowEmptyString('tag_6');
 
         return $validator;
     }
