@@ -77,18 +77,6 @@ class ArticlesController extends AppController
             }
         }
 
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-            if (isset($data['edit_article'])) {
-                // 編集内容保存ボタン押下の場合
-                $this->edit($data, $article_id);
-                $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id . '&redirect=articles_edit']);
-            } else if (isset($data['delete_article'])) {
-                // 編集内容保存ボタン押下の場合
-                $this->delete($article_id);
-            }
-        }
-
         $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow'));
     }
 
@@ -187,73 +175,80 @@ class ArticlesController extends AppController
 
     /**
      * 記事編集処理
-     *
-     * @param array<string, string|int> $data
-     * @param int $article_id
      */
-    private function edit($data, $article_id) {
-        $article = $this->Articles->get($article_id);
+    public function edit() {
+        $article_id = $this->request->getQuery('article_id');
+        $data = $this->request->getData();
 
-        $dom = new DOMDocument;
-        $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
-        $imgs = $dom->getElementsByTagName('img');
+        if ($this->request->is('post')) {
+            $article = $this->Articles->get($article_id);
 
-        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+            $dom = new DOMDocument;
+            $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
+            $imgs = $dom->getElementsByTagName('img');
 
-        if ($imgs->length == 0) {
-            // imgタグが記事本文にない場合
-            // そのまま更新する
-            $this->Articles->patchEntity($article, [
-                'title' => $data['title'],
-                'text' => $data['text'],
-                'tag_1' => $data['tag_1'],
-                'tag_2' => $data['tag_2'],
-                'tag_3' => $data['tag_3'],
-                'tag_4' => $data['tag_4'],
-                'tag_5' => $data['tag_5'],
-                'tag_6' => $data['tag_6'],
-            ]);
-            $this->Articles->save($article);
+            $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
 
-            if (file_exists($img_dir_path)){
-                // 既存の記事画像がある場合はフォルダごと削除する
-                array_map('unlink', glob($img_dir_path. '/*.*'));
-                rmdir($img_dir_path);
+            if ($imgs->length == 0) {
+                // imgタグが記事本文にない場合
+                // そのまま更新する
+                $this->Articles->patchEntity($article, [
+                    'title' => $data['title'],
+                    'text' => $data['text'],
+                    'tag_1' => $data['tag_1'],
+                    'tag_2' => $data['tag_2'],
+                    'tag_3' => $data['tag_3'],
+                    'tag_4' => $data['tag_4'],
+                    'tag_5' => $data['tag_5'],
+                    'tag_6' => $data['tag_6'],
+                ]);
+                $this->Articles->save($article);
+
+                if (file_exists($img_dir_path)){
+                    // 既存の記事画像がある場合はフォルダごと削除する
+                    array_map('unlink', glob($img_dir_path. '/*.*'));
+                    rmdir($img_dir_path);
+                }
+            } else {
+                // imgタグが記事本文にある場合
+                // 記事タイトルはそのまま更新し、記事本文はcreateImageAndUpdateText()で更新する
+                $this->Articles->patchEntity($article, [
+                    'title' => $data['title'],
+                    'tag_1' => $data['tag_1'],
+                    'tag_2' => $data['tag_2'],
+                    'tag_3' => $data['tag_3'],
+                    'tag_4' => $data['tag_4'],
+                    'tag_5' => $data['tag_5'],
+                    'tag_6' => $data['tag_6'],
+                ]);
+                $this->createImageAndUpdateText($dom, $article, 'edit');
             }
-        } else {
-            // imgタグが記事本文にある場合
-            // 記事タイトルはそのまま更新し、記事本文はcreateImageAndUpdateText()で更新する
-            $this->Articles->patchEntity($article, [
-                'title' => $data['title'],
-                'tag_1' => $data['tag_1'],
-                'tag_2' => $data['tag_2'],
-                'tag_3' => $data['tag_3'],
-                'tag_4' => $data['tag_4'],
-                'tag_5' => $data['tag_5'],
-                'tag_6' => $data['tag_6'],
-            ]);
-            $this->createImageAndUpdateText($dom, $article, 'edit');
         }
+
+        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id . '&redirect=articles_edit']);
     }
 
     /**
      * 記事削除処理
-     *
-     * @param int $article_id
      */
-    private function delete($article_id) {
-        $article = $this->Articles->get($article_id);
-        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+    public function delete() {
+        $article_id = $this->request->getQuery('article_id');
 
-        // ユーザーデータを削除
-        if ($this->Articles->delete($article)) {
-            // 記事画像を削除
-            array_map('unlink', glob($img_dir_path . '/*.*'));
-            rmdir($img_dir_path);
+        if ($this->request->is('post')) {
+            $article = $this->Articles->get($article_id);
+            $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
 
-            return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_delete']);
+            // ユーザーデータを削除
+            if ($this->Articles->delete($article)) {
+                // 記事画像を削除
+                array_map('unlink', glob($img_dir_path . '/*.*'));
+                rmdir($img_dir_path);
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_delete']);
+            }
         }
         $this->Flash->error(__('記事を削除できませんでした。'));
+        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
     }
 
     /**

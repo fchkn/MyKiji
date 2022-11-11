@@ -6,7 +6,7 @@
  */
 ?>
 <?= $this->Flash->render() ?>
-<form method="post" name="add_article_form" onSubmit="return clickSubmit()" style="height: 100%">
+<form method="post" name="articles_add_form" style="height: 100%">
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
 <div class="container-fluid">
 

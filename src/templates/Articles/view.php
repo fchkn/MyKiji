@@ -6,7 +6,7 @@
  */
 ?>
 <?= $this->Flash->render() ?>
-<form method="post" name="view_article_form" onSubmit="return clickSubmit()" style="height: 100%">
+<form method="post" name="articles_view_form" style="height: 100%">
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
 <div class="container-fluid">
     <?php if ($hasAuth && $auth_user->id == $article->user_id): ?>
@@ -20,14 +20,14 @@
             </div>
             <!-- 記事保存ボタン -->
             <div class="col-4 d-flex align-self-center justify-content-center">
-                <button type='submit' name="edit_article" onclick="clickEditArticle()">
+                <button type='submit' name="edit_article" onclick="clickEditArticle(<?php echo $article->id ?>)">
                     <img class="pb-2 rounded-circle icon" src="/img/article_post_icon.png" alt="post_icon">
                     <p class="m-0 text-secondary">編集内容を保存する</p>
                 </button>
             </div>
             <!-- 記事削除ボタン -->
             <div class="col-4 d-flex align-self-center justify-content-start">
-                <button type='submit' name="delete_article" onclick="clickDeleteArticle()">
+                <button type='submit' name="delete_article" onclick="clickDeleteArticle(<?php echo $article->id ?>)">
                     <img class="pb-2 rounded-circle icon" src="/img/article_delete_icon.png" alt="delete_icon">
                     <p class="m-0 text-secondary">記事を削除する</p>
                 </button>
@@ -52,7 +52,7 @@
             <div class ="col-1 text-right">
                 <abbr title="お気に入りに追加する場合はログインが必要です">
                     <button type="button">
-                        <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" id="favorite_img" alt="favorite_img">
+                        <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" alt="favorite_img">
                     </button>
                 </abbr>
             </div>
@@ -69,7 +69,7 @@
                     <div class ="col-1 text-right">
                         <abbr title="記事をお気に入りから外す">
                             <button type="button" onclick="location.href='/favorites/delete?article_id=<?php echo $article->id ?>'">
-                                <img class="icon-favorite" src="/img/article_favorite_enable_icon.png" id="favorite_img" alt="favorite_img">
+                                <img class="icon-favorite" src="/img/article_favorite_enable_icon.png" alt="favorite_img">
                             </button>
                         </abbr>
                     </div>
@@ -77,7 +77,7 @@
                     <div class ="col-1 text-right">
                         <abbr title="記事をお気に入りに追加する">
                             <button type="button" onclick="location.href='/favorites/add?article_id=<?php echo $article->id ?>'">
-                                <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" id="favorite_img" alt="favorite_img">
+                                <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" alt="favorite_img">
                             </button>
                         </abbr>
                     </div>

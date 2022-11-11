@@ -149,22 +149,22 @@ class UsersController extends AppController
     {
         if ($this->request->is('post')) {
             $user = $this->Users->get($this->auth_user->id);
-            $post_data = $this->request->getData();
+            $data = $this->request->getData();
 
-            if (isset($post_data['edit_profileinfo'])) {
+            if (isset($data['edit_profileinfo'])) {
                 // プロフィール画像変更
-                if (!empty($post_data['profile_img']->getClientFilename())) {
-                    $this->saveProfileImg($post_data['profile_img'], $user->id);
+                if (!empty($data['profile_img']->getClientFilename())) {
+                    $this->saveProfileImg($data['profile_img'], $user->id);
                 }
 
                 // ユーザー名変更
-                $this->Users->patchEntity($user, ['name' => $post_data['name']]);
-            } else if (isset($post_data['edit_email'])) {
+                $this->Users->patchEntity($user, ['name' => $data['name']]);
+            } else if (isset($data['edit_email'])) {
                 // メールアドレス変更
-                $this->Users->patchEntity($user, ['email' => $post_data['email']]);
-            } else if (isset($post_data['edit_password'])) {
+                $this->Users->patchEntity($user, ['email' => $data['email']]);
+            } else if (isset($data['edit_password'])) {
                 // パスワード変更
-                $this->Users->patchEntity($user, ['password' => $post_data['password_new']]);
+                $this->Users->patchEntity($user, ['password' => $data['password_new']]);
             }
 
             // テーブルを更新
