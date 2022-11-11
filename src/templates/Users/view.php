@@ -29,21 +29,21 @@
         <div class="col-12 mt-5 p-0">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link text-secondary border-left-0 active" data-toggle="tab" href="#post_article">投稿記事</a>
+                    <a class="nav-link text-secondary border-left-0 active" data-toggle="tab" href="#post_article">投稿記事(<?= $this->Paginator->counter('{{count}}', ['model' => 'post_articles']) ?>)</a>
                 </li>
                 <?php if ($isMypage): ?>
                     <li class="nav-item">
-                        <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">お気に入り記事</a>
+                        <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">お気に入り記事(<?= $this->Paginator->counter('{{count}}', ['model' => 'favorite_articles']) ?>)</a>
                     </li>
                 <?php endif; ?>
                 <li class="nav-item">
                     <li class="nav-item">
-                        <a class="nav-link text-secondary" data-toggle="tab" href="#follow">フォロー</a>
+                        <a class="nav-link text-secondary" data-toggle="tab" href="#follow">フォロー(<?= $this->Paginator->counter('{{count}}', ['model' => 'follows']) ?>)</a>
                     </li>
                 </li>
                 <li class="nav-item">
                     <li class="nav-item">
-                        <a class="nav-link text-secondary" data-toggle="tab" href="#follower">フォロワー</a>
+                        <a class="nav-link text-secondary" data-toggle="tab" href="#follower">フォロワー(<?= $this->Paginator->counter('{{count}}', ['model' => 'followers']) ?>)</a>
                     </li>
                 </li>
             </ul>
