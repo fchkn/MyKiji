@@ -39,7 +39,7 @@
         <!-- プロフィール画像 -->
         <div class="col-1">
             <button type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
-                <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg" alt="profile_img">
+                <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img">
             </button>
         </div>
         <!-- ユーザー名・投稿日・更新日 -->
