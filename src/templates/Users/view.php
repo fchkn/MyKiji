@@ -37,7 +37,9 @@
                     </li>
                 <?php endif; ?>
                 <li class="nav-item">
-                    <a class="nav-link text-secondary" data-toggle="tab" href="#follow">フォロー</a>
+                    <li class="nav-item">
+                        <a class="nav-link text-secondary" data-toggle="tab" href="#follow">フォロー</a>
+                    </li>
                 </li>
             </ul>
         </div>
@@ -69,7 +71,13 @@
                 </div>
                 <!-- フォロー -->
                 <div class="tab-pane fade" id="follow">
-                    <div>フォロー</div>
+                    <?php if (empty($follows)): ?>
+                        <h3 class="text-center text-secondary">フォロー中のユーザーはいません</h3>
+                    <?php else: ?>
+                        <div class="row justify-content-center">
+                            <?= $this->element('follow_list', ['follows' => $follows, 'model' => 'follows']) ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

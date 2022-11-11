@@ -16,10 +16,6 @@ class UsersController extends AppController
 {
     use MailerAwareTrait;
 
-    public $paginate = [
-        'limit' => 5,
-    ];
-
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
@@ -65,7 +61,7 @@ class UsersController extends AppController
             'conditions' => ['post_articles.user_id' => $user_id],
             'contain' => ['Users'],
             'order' => ['post_articles.created' => 'desc'],
-        ]), ['scope' => 'post_articles'])->toArray();
+        ]), ['limit' => 5, 'scope' => 'post_articles'])->toArray();
         $this->set(compact('post_articles'));
 
         // お気に入り記事データ取得
@@ -81,12 +77,21 @@ class UsersController extends AppController
             $favorite_articles = $this->paginate($this->Articles->setAlias('favorite_articles')->find('all', [
                 'conditions' => ['OR' => $condition],
                 'contain' => ['Users'],
-            ]), ['scope' => 'favorite_articles'])->toArray();
+                'order' => ['favorite_articles.created' => 'desc'],
+            ]), ['limit' => 5,'scope' => 'favorite_articles'])->toArray();
         }
         $this->set(compact('favorite_articles'));
 
         // Articlesのエイリアス名を元に戻す
         $this->Articles->setAlias($tmpAlias);
+
+        // フォローデータ取得
+        $follows = $this->paginate($this->Follows->find('all', [
+            'conditions' => ['follows.user_id' => $user_id],
+            'contain' => ['FollowUsers'],
+            'order' => ['follows.created' => 'desc'],
+        ]), ['limit' => 10, 'scope' => 'follows'])->toArray();
+        $this->set(compact('follows'));
 
         // ログインユーザーがフォロー中か確認
         $hasFollow = false;
