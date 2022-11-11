@@ -5,13 +5,13 @@
             <div class="row align-items-center">
                 <div class="col-1 pl-2">
                     <!-- プロフィール画像 -->
-                    <button type='button' class="icon-btn" onclick="location.href='/users/view?user_id=<?php echo $follow->follow_user->id?>'">
-                        <img src="/upload/profile_img/user_<?php echo $follow->follow_user->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1 userimg-article">
+                    <button type='button' class="icon-btn" onclick="location.href='/users/view?user_id=<?php echo $follow->{$target . '_user'}->id?>'">
+                        <img src="/upload/profile_img/user_<?php echo $follow->{$target . '_user'}->id ?>.jpg" alt="profile_img" class="img-thumbnail mr-1 userimg-article">
                     </button>
                 </div>
                 <div class="col-11">
-                    <!-- ユーザー名画像 -->
-                    <p class="m-0 text-secondary"><?php echo $follow->follow_user->name ?></p>
+                    <!-- ユーザー名 -->
+                    <p class="m-0 text-secondary"><?php echo $follow->{$target . '_user'}->name ?></p>
                 </div>
             </div>
         </div>

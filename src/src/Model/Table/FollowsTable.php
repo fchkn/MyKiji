@@ -48,7 +48,8 @@ class FollowsTable extends Table
 
         $this->addBehavior('Timestamp');
 
-        $this->belongsTo('Users', [
+        $this->belongsTo('FollowerUsers', [
+            'className' => 'Users',
             'foreignKey' => 'user_id',
             'joinType' => 'INNER',
         ]);
@@ -87,8 +88,8 @@ class FollowsTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
-        $rules->add($rules->existsIn('follow_user_id', 'Users'), ['errorField' => 'follow_user_id']);
+        $rules->add($rules->existsIn('user_id', 'FollowerUsers'), ['errorField' => 'user_id']);
+        $rules->add($rules->existsIn('follow_user_id', 'FollowUsers'), ['errorField' => 'follow_user_id']);
 
         return $rules;
     }

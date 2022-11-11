@@ -85,13 +85,27 @@ class UsersController extends AppController
         // Articlesのエイリアス名を元に戻す
         $this->Articles->setAlias($tmpAlias);
 
+        // Followsのエイリアス名を一時退避
+        $tmpAlias = $this->Follows->getAlias();
+
         // フォローデータ取得
-        $follows = $this->paginate($this->Follows->find('all', [
+        $follows = $this->paginate($this->Follows->setAlias('follows')->find('all', [
             'conditions' => ['follows.user_id' => $user_id],
             'contain' => ['FollowUsers'],
             'order' => ['follows.created' => 'desc'],
         ]), ['limit' => 10, 'scope' => 'follows'])->toArray();
         $this->set(compact('follows'));
+
+        // フォロワーデータ取得
+        $followers = $this->paginate($this->Follows->setAlias('followers')->find('all', [
+            'conditions' => ['followers.follow_user_id' => $user_id],
+            'contain' => ['FollowerUsers'],
+            'order' => ['followers.created' => 'desc'],
+        ]), ['limit' => 10, 'scope' => 'followers'])->toArray();
+        $this->set(compact('followers'));
+
+        // Followsのエイリアス名を元に戻す
+        $this->Follows->setAlias($tmpAlias);
 
         // ログインユーザーがフォロー中か確認
         $hasFollow = false;

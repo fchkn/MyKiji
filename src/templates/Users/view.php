@@ -41,6 +41,11 @@
                         <a class="nav-link text-secondary" data-toggle="tab" href="#follow">フォロー</a>
                     </li>
                 </li>
+                <li class="nav-item">
+                    <li class="nav-item">
+                        <a class="nav-link text-secondary" data-toggle="tab" href="#follower">フォロワー</a>
+                    </li>
+                </li>
             </ul>
         </div>
     </div>
@@ -75,7 +80,17 @@
                         <h3 class="text-center text-secondary">フォロー中のユーザーはいません</h3>
                     <?php else: ?>
                         <div class="row justify-content-center">
-                            <?= $this->element('follow_list', ['follows' => $follows, 'model' => 'follows']) ?>
+                            <?= $this->element('follow_list', ['follows' => $follows, 'target' => 'follow', 'model' => 'follows']) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <!-- フォロワー -->
+                <div class="tab-pane fade" id="follower">
+                    <?php if (empty($followers)): ?>
+                        <h3 class="text-center text-secondary">フォロワーはいません</h3>
+                    <?php else: ?>
+                        <div class="row justify-content-center">
+                            <?= $this->element('follow_list', ['follows' => $followers, 'target' => 'follower', 'model' => 'followers']) ?>
                         </div>
                     <?php endif; ?>
                 </div>

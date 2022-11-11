@@ -10,7 +10,7 @@
                     </button>
                 </div>
                 <div class="col-11">
-                    <!-- ユーザー名画像 -->
+                    <!-- ユーザー名 -->
                     <p class="m-0 text-secondary"><?php echo $article->user->name ?></p>
                     <!-- 記事投稿日 -->
                     <p class="m-0 text-secondary"><?php echo date('Y/m/d G:i',  strtotime($article->created)) ?></p>
