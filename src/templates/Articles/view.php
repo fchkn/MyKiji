@@ -65,19 +65,19 @@
             </div>
         <?php else: ?>
             <?php if ($user->id != $auth_user->id): ?>
-                <?php if ($favorite_flg == 0): ?>
+                <?php if ($hasFavorite): ?>
                     <div class ="col-1 text-right">
-                        <abbr title="記事をお気に入りに追加する">
-                            <button type="button" onclick="clickFavorite(<?php echo $article->id ?>, <?php echo $auth_user->id ?>, 1)">
-                                <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" id="favorite_img" alt="favorite_img">
+                        <abbr title="記事をお気に入りから外す">
+                            <button type="button" onclick="location.href='/favorites/delete?article_id=<?php echo $article->id ?>'">
+                                <img class="icon-favorite" src="/img/article_favorite_enable_icon.png" id="favorite_img" alt="favorite_img">
                             </button>
                         </abbr>
                     </div>
-                <?php elseif ($favorite_flg == 1): ?>
+                <?php else: ?>
                     <div class ="col-1 text-right">
-                        <abbr title="記事をお気に入りから外す">
-                            <button type="button" onclick="clickFavorite(<?php echo $article->id ?>, <?php echo $auth_user->id ?>, 0)">
-                                <img class="icon-favorite" src="/img/article_favorite_enable_icon.png" id="favorite_img" alt="favorite_img">
+                        <abbr title="記事をお気に入りに追加する">
+                            <button type="button" onclick="location.href='/favorites/add?article_id=<?php echo $article->id ?>'">
+                                <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" id="favorite_img" alt="favorite_img">
                             </button>
                         </abbr>
                     </div>

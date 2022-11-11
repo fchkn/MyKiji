@@ -58,7 +58,7 @@ class ArticlesController extends AppController
         // ユーザーデータ取得
         $user = $this->Users->findById($article->user_id)->first();
 
-        $favorite_flg = 0;
+        $hasFavorite = false;
         $hasFollow = false;
         if ($this->hasAuth) {
             // お気に入り登録の有無を確認
@@ -66,7 +66,7 @@ class ArticlesController extends AppController
                 'user_id' => $this->auth_user->id,
                 'article_id' => $article_id])->first();
             if(!empty($favorite)) {
-                $favorite_flg = 1;
+                $hasFavorite = true;
             }
             // フォローの有無を確認
             $follow = $this->Follows->find()->where([
@@ -89,7 +89,7 @@ class ArticlesController extends AppController
             }
         }
 
-        $this->set(compact('article', 'user', 'favorite_flg', 'hasFollow'));
+        $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow'));
     }
 
     /**
