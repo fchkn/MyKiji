@@ -34,6 +34,7 @@ class UsersController extends AppController
         $this->loadComponent('Paginator');
         $this->Articles = TableRegistry::get('articles');
         $this->Favorites = TableRegistry::get('favorites');
+        $this->Follows = TableRegistry::get('follows');
     }
 
     /**
@@ -42,8 +43,6 @@ class UsersController extends AppController
     public function view() {
         $user_id = $this->request->getQuery('user_id');
         $user = null;
-        $isMypage = false;
-        $tmpAlias = $this->Articles->getAlias();
 
         // ユーザーデータ取得
         if (!empty($user_id) && is_numeric($user_id)) {
@@ -58,13 +57,15 @@ class UsersController extends AppController
             return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
 
+        // Artilcesのエイリアス名を一時退避
+        $tmpAlias = $this->Articles->getAlias();
+
         // 投稿記事データ取得
         $post_articles = $this->paginate($this->Articles->setAlias('post_articles')->find('all', [
             'conditions' => ['post_articles.user_id' => $user_id],
             'contain' => ['Users'],
             'order' => ['post_articles.created' => 'desc'],
         ]), ['scope' => 'post_articles'])->toArray();
-
         $this->set(compact('post_articles'));
 
         // お気に入り記事データ取得
@@ -82,21 +83,32 @@ class UsersController extends AppController
                 'contain' => ['Users'],
             ]), ['scope' => 'favorite_articles'])->toArray();
         }
-
         $this->set(compact('favorite_articles'));
 
-        //エイリアス名を元に戻す
+        // Articlesのエイリアス名を元に戻す
         $this->Articles->setAlias($tmpAlias);
+
+        // ログインユーザーがフォロー中か確認
+        $hasFollow = false;
+        if ($this->hasAuth) {
+            $follow = $this->Follows->find()->where([
+                'user_id' => $this->auth_user->id,
+                'follow_user_id' => $user_id])->first();
+            if(!empty($follow)) {
+                $hasFollow = true;
+            }
+        }
 
         // ページネーション要否
         $hasPaginator = true;
 
         // マイページ判定
+        $isMypage = false;
         if ($this->hasAuth && $user_id == $this->auth_user->id) {
             $isMypage = true;
         }
 
-        $this->set(compact('user', 'post_articles', 'hasPaginator', 'isMypage'));
+        $this->set(compact('user', 'post_articles', 'hasFollow', 'hasPaginator', 'isMypage'));
     }
 
     /**

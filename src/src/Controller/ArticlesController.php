@@ -32,6 +32,7 @@ class ArticlesController extends AppController
         $this->loadComponent('Paginator');
         $this->Users = TableRegistry::get('users');
         $this->Favorites = TableRegistry::get('favorites');
+        $this->Follows = TableRegistry::get('follows');
     }
 
     /**
@@ -57,20 +58,27 @@ class ArticlesController extends AppController
         // ユーザーデータ取得
         $user = $this->Users->findById($article->user_id)->first();
 
-        // お気に入り登録の有無を確認
         $favorite_flg = 0;
+        $hasFollow = false;
         if ($this->hasAuth) {
+            // お気に入り登録の有無を確認
             $favorite = $this->Favorites->find()->where([
                 'user_id' => $this->auth_user->id,
                 'article_id' => $article_id])->first();
             if(!empty($favorite)) {
                 $favorite_flg = 1;
             }
+            // フォローの有無を確認
+            $follow = $this->Follows->find()->where([
+                'user_id' => $this->auth_user->id,
+                'follow_user_id' => $user->id])->first();
+            if(!empty($follow)) {
+                $hasFollow = true;
+            }
         }
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-
             if (isset($data['edit_article'])) {
                 // 編集内容保存ボタン押下の場合
                 $this->edit($data, $article_id);
@@ -81,7 +89,7 @@ class ArticlesController extends AppController
             }
         }
 
-        $this->set(compact('article', 'user', 'favorite_flg'));
+        $this->set(compact('article', 'user', 'favorite_flg', 'hasFollow'));
     }
 
     /**

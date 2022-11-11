@@ -44,3 +44,19 @@ ALTER TABLE favorites ADD CONSTRAINT fk_favorite_user FOREIGN KEY (user_id) REFE
 
 /* お気に入り記事外部キー追加 */
 ALTER TABLE favorites ADD CONSTRAINT fk_favorite_article FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE;
+
+/* ================================================================================= */
+/* フォローテーブル追加 */
+CREATE TABLE follows (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    follow_user_id INT UNSIGNED NOT NULL,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+/* フォロワーユーザー外部キー追加 */
+ALTER TABLE follows ADD CONSTRAINT fk_follower_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
+
+/* フォローユーザー外部キー追加 */
+ALTER TABLE follows ADD CONSTRAINT fk_follow_user FOREIGN KEY (follow_user_id) REFERENCES users (id) ON DELETE CASCADE;

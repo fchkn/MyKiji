@@ -59,17 +59,13 @@ class AppController extends Controller
     {
         // ログイン判定
         $result = $this->Authentication->getResult();
-
         if ($result->isValid()) {
             $this->hasAuth = true;
             $this->auth_user = $this->Authentication->getIdentity();
         }
-
         $hasAuth = $this->hasAuth;
         $auth_user = $this->auth_user;
-
         $this->set(compact('hasAuth', 'auth_user'));
-
 
         // 共通レイアウト適用
         $this->viewBuilder()->setLayout('common');

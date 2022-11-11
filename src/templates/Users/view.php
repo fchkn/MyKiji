@@ -13,8 +13,16 @@
         </div>
         <div class="col-4 align-self-center text-right pr-5">
             <?php if($isMypage): ?>
-            <p class="mb-3"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
-            <p class="m-0"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/edit'" value="アカウント設定"/></p>
+                <p class="mb-3"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
+                <p class="m-0"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/edit'" value="アカウント設定"/></p>
+            <?php else: ?>
+                <?php if ($hasAuth): ?>
+                    <?php if ($hasFollow): ?>
+                        <p><input type="button" class="btn btn-primary btn-sm" onclick="location.href='/follows/delete?follow_user_id=<?php echo $user->id ?>'" value="フォロー中"/></p>
+                    <?php else: ?>
+                        <p><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/follows/add?follow_user_id=<?php echo $user->id ?>'" value="フォローする"/></p>
+                    <?php endif; ?>
+                <? endif; ?>
             <?php endif; ?>
         </div>
 
@@ -23,10 +31,10 @@
                 <li class="nav-item">
                     <a class="nav-link text-secondary border-left-0 active" data-toggle="tab" href="#post_article">投稿記事</a>
                 </li>
-                <?php if($isMypage): ?>
-                <li class="nav-item">
-                    <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">お気に入り記事</a>
-                </li>
+                <?php if ($isMypage): ?>
+                    <li class="nav-item">
+                        <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">お気に入り記事</a>
+                    </li>
                 <?php endif; ?>
                 <li class="nav-item">
                     <a class="nav-link text-secondary" data-toggle="tab" href="#follow">フォロー</a>
