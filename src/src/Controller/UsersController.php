@@ -53,37 +53,21 @@ class UsersController extends AppController
             return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
 
-        // Artilcesのエイリアス名を一時退避
-        $tmpAlias = $this->Articles->getAlias();
-
         // 投稿記事データ取得
-        $post_articles = $this->paginate($this->Articles->setAlias('post_articles')->find('all', [
-            'conditions' => ['post_articles.user_id' => $user_id],
+        $post_articles = $this->paginate($this->Articles->find('all', [
+            'conditions' => ['articles.user_id' => $user_id],
             'contain' => ['Users'],
-            'order' => ['post_articles.created' => 'desc'],
-        ]), ['limit' => 5, 'scope' => 'post_articles'])->toArray();
+            'order' => ['articles.created' => 'desc'],
+        ]), ['limit' => 5, 'scope' => 'articles'])->toArray();
         $this->set(compact('post_articles'));
 
-        // お気に入り記事データ取得
-        $favorite_articles = [];
-        $favorites = $this->Favorites->find('all', [
+        // お気に入りデータ取得
+        $favorites = $this->paginate($this->Favorites->find('all', [
             'conditions' => ['favorites.user_id' => $user_id],
-        ])->toArray();
-        if (!empty($favorites)) {
-            $condition = [];
-            foreach ($favorites as $favorite) {
-                $condition[] = ['favorite_articles.id' => $favorite->article_id];
-            }
-            $favorite_articles = $this->paginate($this->Articles->setAlias('favorite_articles')->find('all', [
-                'conditions' => ['OR' => $condition],
-                'contain' => ['Users'],
-                'order' => ['favorite_articles.created' => 'desc'],
-            ]), ['limit' => 5,'scope' => 'favorite_articles'])->toArray();
-        }
-        $this->set(compact('favorite_articles'));
-
-        // Articlesのエイリアス名を元に戻す
-        $this->Articles->setAlias($tmpAlias);
+            'contain' => ['Articles.Users'],
+            'order' => ['favorites.created' => 'desc'],
+        ]), ['limit' => 5,'scope' => 'favorites'])->toArray();
+        $this->set(compact('favorites'));
 
         // Followsのエイリアス名を一時退避
         $tmpAlias = $this->Follows->getAlias();
