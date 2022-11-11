@@ -207,6 +207,10 @@ class UsersController extends AppController
         if ($this->request->is('post')) {
             $user = $this->Users->get($this->auth_user->id);
 
+            $articles = $this->Articles->find('all', [
+                'conditions' => ['user_id' => $this->auth_user->id]
+            ])->toArray();
+
             // ユーザーデータを削除
             if ($this->Users->delete($user)) {
                 // ログアウト処理を実行
@@ -216,6 +220,15 @@ class UsersController extends AppController
 
                 // プロフィール画像を削除
                 unlink(UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
+
+                // 記事画像を削除
+                foreach ($articles as $article) {
+                    $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article->id;
+                    if (file_exists($img_dir_path)) {
+                        array_map('unlink', glob($img_dir_path. '/*.*'));
+                        rmdir($img_dir_path);
+                    }
+                }
 
                 // 退会完了メールを送信
                 $this->getMailer('User')->send('withdrawal', [$user]);
