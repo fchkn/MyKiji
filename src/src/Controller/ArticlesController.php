@@ -77,7 +77,14 @@ class ArticlesController extends AppController
             }
         }
 
-        $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow'));
+        // リダイレクトプロパティ取得
+        $session = $this->getRequest()->getSession();
+        $redirect = $session->read('redirect');
+        if (!empty($redirect)) {
+            $session->delete('redirect');
+        }
+
+        $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow', 'redirect'));
     }
 
     /**
@@ -166,7 +173,11 @@ class ArticlesController extends AppController
                     $this->createImageAndUpdateText($dom, $article, 'add');
                 }
 
-                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_add']);
+                // 記事追加完了ポップアップの判定パラメータをセッションに格納
+                $session = $this->getRequest()->getSession();
+                $session->write('redirect', 'articles_add');
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
             }
 
             $this->Flash->error(__('記事追加に失敗しました'));
@@ -225,7 +236,11 @@ class ArticlesController extends AppController
             }
         }
 
-        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id . '&redirect=articles_edit']);
+        // 記事削除完了ポップアップの判定パラメータをセッションに格納
+        $session = $this->getRequest()->getSession();
+        $session->write('redirect', 'articles_edit');
+
+        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
     }
 
     /**
@@ -244,7 +259,11 @@ class ArticlesController extends AppController
                 array_map('unlink', glob($img_dir_path . '/*.*'));
                 rmdir($img_dir_path);
 
-                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_delete']);
+                // 記事削除完了ポップアップの判定パラメータをセッションに格納
+                $session = $this->getRequest()->getSession();
+                $session->write('redirect', 'articles_delete');
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
             }
         }
         $this->Flash->error(__('記事を削除できませんでした。'));

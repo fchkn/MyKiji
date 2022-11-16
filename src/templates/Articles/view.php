@@ -140,6 +140,24 @@
 <!-- 記事エディタ モーダルウィンドウ -->
 <?= $this->element('article_editor_modal') ?>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var redirect = '<?php echo $redirect; ?>';
+
+    var state = window.history.state;
+    var state_has_alert = false;
+    if (state && state.hasOwnProperty('has_alert')) {
+        state_has_alert = true;
+    }
+
+    if (redirect === "articles_edit" && !state_has_alert) {
+        // 記事編集処理後にリダイレクトされた場合
+        history.replaceState({ 'has_alert': true }, '');
+        alert('編集内容を保存しました');
+    }
+});
+</script>
+
 <?php
 echo $this->Html->css('article');
 echo $this->Html->script('article');

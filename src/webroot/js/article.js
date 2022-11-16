@@ -51,11 +51,6 @@ var quill = new Quill('#quill_editor', {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
-    if (location.search.match('redirect=articles_edit')) {
-        // 記事編集処理後にリダイレクトされた場合
-        alert('編集内容を保存しました');
-    }
-
     $("#title").val(title_view.innerHTML);
     $("#text").val(text_view.innerHTML);
     modal_title.value = title_view.innerHTML;

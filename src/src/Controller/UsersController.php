@@ -111,7 +111,14 @@ class UsersController extends AppController
             $isMypage = true;
         }
 
-        $this->set(compact('user', 'post_articles', 'hasFollow', 'hasPaginator', 'isMypage'));
+        // リダイレクトプロパティ取得
+        $session = $this->getRequest()->getSession();
+        $redirect = $session->read('redirect');
+        if (!empty($redirect)) {
+            $session->delete('redirect');
+        }
+
+        $this->set(compact('user', 'post_articles', 'hasFollow', 'hasPaginator', 'isMypage', 'redirect'));
     }
 
     /**

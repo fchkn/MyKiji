@@ -100,14 +100,28 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    var param = location.search;
-    if (param.match('redirect=articles_add')) {
-        // 記事追加処理からリダイレクトされた場合
-        alert('記事を投稿しました');
-    } else if (param.match('redirect=articles_delete')) {
-        // 記事削除処理からリダイレクトされた場合
-        alert('記事を削除しました');
+document.addEventListener('DOMContentLoaded', function() {
+    var redirect = '<?php echo $redirect; ?>';
+
+    var state = window.history.state;
+    var state_has_alert = false;
+    if (state && state.hasOwnProperty('has_alert')) {
+        state_has_alert = true;
+    }
+
+    if (!state_has_alert) {
+        switch (redirect) {
+            case 'articles_add' :
+                // 記事追加処理からリダイレクトされた場合
+                history.replaceState({ 'has_alert': true }, '');
+                alert('記事を投稿しました');
+                break;
+            case 'articles_delete' :
+                // 記事削除処理からリダイレクトされた場合
+                history.replaceState({ 'has_alert': true }, '');
+                alert('記事を削除しました');
+                break;
+        }
     }
 });
 </script>
