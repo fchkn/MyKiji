@@ -16,10 +16,6 @@ class UsersController extends AppController
 {
     use MailerAwareTrait;
 
-    public $paginate = [
-        'limit' => 5,
-    ];
-
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
@@ -34,6 +30,7 @@ class UsersController extends AppController
         $this->loadComponent('Paginator');
         $this->Articles = TableRegistry::get('articles');
         $this->Favorites = TableRegistry::get('favorites');
+        $this->Follows = TableRegistry::get('follows');
     }
 
     /**
@@ -42,7 +39,6 @@ class UsersController extends AppController
     public function view() {
         $user_id = $this->request->getQuery('user_id');
         $user = null;
-        $isMypage = false;
 
         // ユーザーデータ取得
         if (!empty($user_id) && is_numeric($user_id)) {
@@ -62,16 +58,67 @@ class UsersController extends AppController
             'conditions' => ['articles.user_id' => $user_id],
             'contain' => ['Users'],
             'order' => ['articles.created' => 'desc'],
-        ]))->toArray();
+        ]), ['limit' => 5, 'scope' => 'articles'])->toArray();
+        $this->set(compact('post_articles'));
 
+        // お気に入りデータ取得
+        $favorites = $this->paginate($this->Favorites->find('all', [
+            'conditions' => ['favorites.user_id' => $user_id],
+            'contain' => ['Articles.Users'],
+            'order' => ['favorites.created' => 'desc'],
+        ]), ['limit' => 5,'scope' => 'favorites'])->toArray();
+        $this->set(compact('favorites'));
+
+        // Followsのエイリアス名を一時退避
+        $tmpAlias = $this->Follows->getAlias();
+
+        // フォローデータ取得
+        $follows = $this->paginate($this->Follows->setAlias('follows')->find('all', [
+            'conditions' => ['follows.user_id' => $user_id],
+            'contain' => ['FollowUsers'],
+            'order' => ['follows.created' => 'desc'],
+        ]), ['limit' => 10, 'scope' => 'follows'])->toArray();
+        $this->set(compact('follows'));
+
+        // フォロワーデータ取得
+        $followers = $this->paginate($this->Follows->setAlias('followers')->find('all', [
+            'conditions' => ['followers.follow_user_id' => $user_id],
+            'contain' => ['FollowerUsers'],
+            'order' => ['followers.created' => 'desc'],
+        ]), ['limit' => 10, 'scope' => 'followers'])->toArray();
+        $this->set(compact('followers'));
+
+        // Followsのエイリアス名を元に戻す
+        $this->Follows->setAlias($tmpAlias);
+
+        // ログインユーザーがフォロー中か確認
+        $hasFollow = false;
+        if ($this->hasAuth) {
+            $follow = $this->Follows->find()->where([
+                'user_id' => $this->auth_user->id,
+                'follow_user_id' => $user_id])->first();
+            if(!empty($follow)) {
+                $hasFollow = true;
+            }
+        }
+
+        // ページネーション要否
         $hasPaginator = true;
 
         // マイページ判定
+        $isMypage = false;
         if ($this->hasAuth && $user_id == $this->auth_user->id) {
             $isMypage = true;
         }
 
-        $this->set(compact('user', 'post_articles', 'hasPaginator', 'isMypage'));
+        // リダイレクトプロパティ取得
+        $session = $this->getRequest()->getSession();
+        $redirect = $session->read('redirect');
+        if (!empty($redirect)) {
+            $session->delete('redirect');
+        }
+
+        $this->set(compact('user', 'post_articles', 'hasFollow', 'hasPaginator', 'isMypage', 'redirect'));
     }
 
     /**
@@ -83,11 +130,6 @@ class UsersController extends AppController
             $user = $this->Users->newEmptyEntity();
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
-                // お気に入り記事テーブルを作成
-                $favorite = $this->Favorites->newEmptyEntity();
-                $this->Favorites->patchEntity($favorite, ['user_id' => $user->id]);
-                $this->Favorites->save($favorite);
-
                 // 認証設定してログイン状態にする
                 $this->Authentication->setIdentity($user);
 
@@ -117,22 +159,22 @@ class UsersController extends AppController
     {
         if ($this->request->is('post')) {
             $user = $this->Users->get($this->auth_user->id);
-            $post_data = $this->request->getData();
+            $data = $this->request->getData();
 
-            if (isset($post_data['edit_profileinfo'])) {
+            if (isset($data['edit_profileinfo'])) {
                 // プロフィール画像変更
-                if (!empty($post_data['profile_img']->getClientFilename())) {
-                    $this->saveProfileImg($post_data['profile_img'], $user->id);
+                if (!empty($data['profile_img']->getClientFilename())) {
+                    $this->saveProfileImg($data['profile_img'], $user->id);
                 }
 
                 // ユーザー名変更
-                $this->Users->patchEntity($user, ['name' => $post_data['name']]);
-            } else if (isset($post_data['edit_email'])) {
+                $this->Users->patchEntity($user, ['name' => $data['name']]);
+            } else if (isset($data['edit_email'])) {
                 // メールアドレス変更
-                $this->Users->patchEntity($user, ['email' => $post_data['email']]);
-            } else if (isset($post_data['edit_password'])) {
+                $this->Users->patchEntity($user, ['email' => $data['email']]);
+            } else if (isset($data['edit_password'])) {
                 // パスワード変更
-                $this->Users->patchEntity($user, ['password' => $post_data['password_new']]);
+                $this->Users->patchEntity($user, ['password' => $data['password_new']]);
             }
 
             // テーブルを更新
@@ -156,6 +198,10 @@ class UsersController extends AppController
         if ($this->request->is('post')) {
             $user = $this->Users->get($this->auth_user->id);
 
+            $articles = $this->Articles->find('all', [
+                'conditions' => ['user_id' => $this->auth_user->id]
+            ])->toArray();
+
             // ユーザーデータを削除
             if ($this->Users->delete($user)) {
                 // ログアウト処理を実行
@@ -165,6 +211,15 @@ class UsersController extends AppController
 
                 // プロフィール画像を削除
                 unlink(UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
+
+                // 記事画像を削除
+                foreach ($articles as $article) {
+                    $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article->id;
+                    if (file_exists($img_dir_path)) {
+                        array_map('unlink', glob($img_dir_path. '/*.*'));
+                        rmdir($img_dir_path);
+                    }
+                }
 
                 // 退会完了メールを送信
                 $this->getMailer('User')->send('withdrawal', [$user]);
@@ -220,6 +275,9 @@ class UsersController extends AppController
 
     /**
      * プロフィール画像保存処理
+     *
+     * @param LaminasDiactorosUploadedFile $profile_img
+     * @param int $user_id
      */
     private function saveProfileImg($profile_img, $user_id)
     {

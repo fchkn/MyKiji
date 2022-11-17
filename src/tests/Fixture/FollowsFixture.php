@@ -6,9 +6,9 @@ namespace App\Test\Fixture;
 use Cake\TestSuite\Fixture\TestFixture;
 
 /**
- * FavoritesFixture
+ * FollowsFixture
  */
-class FavoritesFixture extends TestFixture
+class FollowsFixture extends TestFixture
 {
     /**
      * Init method
@@ -21,9 +21,9 @@ class FavoritesFixture extends TestFixture
             [
                 'id' => 1,
                 'user_id' => 1,
-                'article_id' => 1,
-                'created' => '2022-11-09 15:41:30',
-                'modified' => '2022-11-09 15:41:30',
+                'follow_user_id' => 1,
+                'created' => '2022-11-09 23:36:37',
+                'modified' => '2022-11-09 23:36:37',
             ],
         ];
         parent::init();

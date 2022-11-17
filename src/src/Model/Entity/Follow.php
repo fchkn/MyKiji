@@ -6,17 +6,17 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Favorite Entity
+ * Follow Entity
  *
  * @property int $id
  * @property int $user_id
- * @property int $article_id
+ * @property int $follow_user_id
  * @property \Cake\I18n\FrozenTime $created
  * @property \Cake\I18n\FrozenTime $modified
  *
  * @property \App\Model\Entity\User $user
  */
-class Favorite extends Entity
+class Follow extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -29,7 +29,7 @@ class Favorite extends Entity
      */
     protected $_accessible = [
         'user_id' => true,
-        'article_id' => true,
+        'follow_user_id' => true,
         'created' => true,
         'modified' => true,
         'user' => true,

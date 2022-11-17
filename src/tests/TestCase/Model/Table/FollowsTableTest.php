@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\FavoritesTable;
+use App\Model\Table\FollowsTable;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\FavoritesTable Test Case
+ * App\Model\Table\FollowsTable Test Case
  */
-class FavoritesTableTest extends TestCase
+class FollowsTableTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \App\Model\Table\FavoritesTable
+     * @var \App\Model\Table\FollowsTable
      */
-    protected $Favorites;
+    protected $Follows;
 
     /**
      * Fixtures
@@ -24,7 +24,7 @@ class FavoritesTableTest extends TestCase
      * @var array<string>
      */
     protected $fixtures = [
-        'app.Favorites',
+        'app.Follows',
         'app.Users',
     ];
 
@@ -36,8 +36,8 @@ class FavoritesTableTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $config = $this->getTableLocator()->exists('Favorites') ? [] : ['className' => FavoritesTable::class];
-        $this->Favorites = $this->getTableLocator()->get('Favorites', $config);
+        $config = $this->getTableLocator()->exists('Follows') ? [] : ['className' => FollowsTable::class];
+        $this->Follows = $this->getTableLocator()->get('Follows', $config);
     }
 
     /**
@@ -47,7 +47,7 @@ class FavoritesTableTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->Favorites);
+        unset($this->Follows);
 
         parent::tearDown();
     }
@@ -56,7 +56,7 @@ class FavoritesTableTest extends TestCase
      * Test validationDefault method
      *
      * @return void
-     * @uses \App\Model\Table\FavoritesTable::validationDefault()
+     * @uses \App\Model\Table\FollowsTable::validationDefault()
      */
     public function testValidationDefault(): void
     {
@@ -67,7 +67,7 @@ class FavoritesTableTest extends TestCase
      * Test buildRules method
      *
      * @return void
-     * @uses \App\Model\Table\FavoritesTable::buildRules()
+     * @uses \App\Model\Table\FollowsTable::buildRules()
      */
     public function testBuildRules(): void
     {

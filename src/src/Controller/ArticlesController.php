@@ -32,6 +32,7 @@ class ArticlesController extends AppController
         $this->loadComponent('Paginator');
         $this->Users = TableRegistry::get('users');
         $this->Favorites = TableRegistry::get('favorites');
+        $this->Follows = TableRegistry::get('follows');
     }
 
     /**
@@ -57,35 +58,33 @@ class ArticlesController extends AppController
         // ユーザーデータ取得
         $user = $this->Users->findById($article->user_id)->first();
 
-        // お気に入り登録の有無を確認
-        $favorite_flg = 0;
+        $hasFavorite = false;
+        $hasFollow = false;
         if ($this->hasAuth) {
-            $favorite = $this->Favorites->find()->where(['user_id' => $this->auth_user->id])->first();
-            $favorite_article_id_str = $favorite->article_id;
-            if(!empty($favorite_article_id_str)) {
-                $favorite_article_id_array = explode(',', $favorite_article_id_str);
-                foreach ($favorite_article_id_array as $favorite_article_id) {
-                    if ($favorite_article_id == $article_id) {
-                        $favorite_flg = 1;
-                    }
-                }
+            // お気に入り登録の有無を確認
+            $favorite = $this->Favorites->find()->where([
+                'user_id' => $this->auth_user->id,
+                'article_id' => $article_id])->first();
+            if(!empty($favorite)) {
+                $hasFavorite = true;
+            }
+            // フォローの有無を確認
+            $follow = $this->Follows->find()->where([
+                'user_id' => $this->auth_user->id,
+                'follow_user_id' => $user->id])->first();
+            if(!empty($follow)) {
+                $hasFollow = true;
             }
         }
 
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-
-            if (isset($data['edit_article'])) {
-                // 編集内容保存ボタン押下の場合
-                $this->edit($data, $article_id);
-                $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id . '&redirect=articles_edit']);
-            } else if (isset($data['delete_article'])) {
-                // 編集内容保存ボタン押下の場合
-                $this->delete($article_id);
-            }
+        // リダイレクトプロパティ取得
+        $session = $this->getRequest()->getSession();
+        $redirect = $session->read('redirect');
+        if (!empty($redirect)) {
+            $session->delete('redirect');
         }
 
-        $this->set(compact('article', 'user', 'favorite_flg'));
+        $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow', 'redirect'));
     }
 
     /**
@@ -174,7 +173,11 @@ class ArticlesController extends AppController
                     $this->createImageAndUpdateText($dom, $article, 'add');
                 }
 
-                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_add']);
+                // 記事追加完了ポップアップの判定パラメータをセッションに格納
+                $session = $this->getRequest()->getSession();
+                $session->write('redirect', 'articles_add');
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
             }
 
             $this->Flash->error(__('記事追加に失敗しました'));
@@ -183,73 +186,88 @@ class ArticlesController extends AppController
 
     /**
      * 記事編集処理
-     *
-     * @param array<string, string|int> $data
-     * @param int $article_id
      */
-    private function edit($data, $article_id) {
-        $article = $this->Articles->get($article_id);
+    public function edit() {
+        $article_id = $this->request->getQuery('article_id');
+        $data = $this->request->getData();
 
-        $dom = new DOMDocument;
-        $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
-        $imgs = $dom->getElementsByTagName('img');
+        if ($this->request->is('post')) {
+            $article = $this->Articles->get($article_id);
 
-        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+            $dom = new DOMDocument;
+            $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
+            $imgs = $dom->getElementsByTagName('img');
 
-        if ($imgs->length == 0) {
-            // imgタグが記事本文にない場合
-            // そのまま更新する
-            $this->Articles->patchEntity($article, [
-                'title' => $data['title'],
-                'text' => $data['text'],
-                'tag_1' => $data['tag_1'],
-                'tag_2' => $data['tag_2'],
-                'tag_3' => $data['tag_3'],
-                'tag_4' => $data['tag_4'],
-                'tag_5' => $data['tag_5'],
-                'tag_6' => $data['tag_6'],
-            ]);
-            $this->Articles->save($article);
+            $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
 
-            if (file_exists($img_dir_path)){
-                // 既存の記事画像がある場合はフォルダごと削除する
-                array_map('unlink', glob($img_dir_path. '/*.*'));
-                rmdir($img_dir_path);
+            if ($imgs->length == 0) {
+                // imgタグが記事本文にない場合
+                // そのまま更新する
+                $this->Articles->patchEntity($article, [
+                    'title' => $data['title'],
+                    'text' => $data['text'],
+                    'tag_1' => $data['tag_1'],
+                    'tag_2' => $data['tag_2'],
+                    'tag_3' => $data['tag_3'],
+                    'tag_4' => $data['tag_4'],
+                    'tag_5' => $data['tag_5'],
+                    'tag_6' => $data['tag_6'],
+                ]);
+                $this->Articles->save($article);
+
+                if (file_exists($img_dir_path)){
+                    // 既存の記事画像がある場合はフォルダごと削除する
+                    array_map('unlink', glob($img_dir_path. '/*.*'));
+                    rmdir($img_dir_path);
+                }
+            } else {
+                // imgタグが記事本文にある場合
+                // 記事タイトルはそのまま更新し、記事本文はcreateImageAndUpdateText()で更新する
+                $this->Articles->patchEntity($article, [
+                    'title' => $data['title'],
+                    'tag_1' => $data['tag_1'],
+                    'tag_2' => $data['tag_2'],
+                    'tag_3' => $data['tag_3'],
+                    'tag_4' => $data['tag_4'],
+                    'tag_5' => $data['tag_5'],
+                    'tag_6' => $data['tag_6'],
+                ]);
+                $this->createImageAndUpdateText($dom, $article, 'edit');
             }
-        } else {
-            // imgタグが記事本文にある場合
-            // 記事タイトルはそのまま更新し、記事本文はcreateImageAndUpdateText()で更新する
-            $this->Articles->patchEntity($article, [
-                'title' => $data['title'],
-                'tag_1' => $data['tag_1'],
-                'tag_2' => $data['tag_2'],
-                'tag_3' => $data['tag_3'],
-                'tag_4' => $data['tag_4'],
-                'tag_5' => $data['tag_5'],
-                'tag_6' => $data['tag_6'],
-            ]);
-            $this->createImageAndUpdateText($dom, $article, 'edit');
         }
+
+        // 記事削除完了ポップアップの判定パラメータをセッションに格納
+        $session = $this->getRequest()->getSession();
+        $session->write('redirect', 'articles_edit');
+
+        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
     }
 
     /**
      * 記事削除処理
-     *
-     * @param int $article_id
      */
-    private function delete($article_id) {
-        $article = $this->Articles->get($article_id);
-        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+    public function delete() {
+        $article_id = $this->request->getQuery('article_id');
 
-        // ユーザーデータを削除
-        if ($this->Articles->delete($article)) {
-            // 記事画像を削除
-            array_map('unlink', glob($img_dir_path . '/*.*'));
-            rmdir($img_dir_path);
+        if ($this->request->is('post')) {
+            $article = $this->Articles->get($article_id);
+            $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
 
-            return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id . '&redirect=articles_delete']);
+            // ユーザーデータを削除
+            if ($this->Articles->delete($article)) {
+                // 記事画像を削除
+                array_map('unlink', glob($img_dir_path . '/*.*'));
+                rmdir($img_dir_path);
+
+                // 記事削除完了ポップアップの判定パラメータをセッションに格納
+                $session = $this->getRequest()->getSession();
+                $session->write('redirect', 'articles_delete');
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
+            }
         }
         $this->Flash->error(__('記事を削除できませんでした。'));
+        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
     }
 
     /**

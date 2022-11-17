@@ -13,7 +13,6 @@ var tag_4_view = document.getElementById("tag_4_view");
 var tag_5_view = document.getElementById("tag_5_view");
 var tag_6_view = document.getElementById("tag_6_view");
 var text_view = document.getElementById("text_view");
-var click_btn = "";
 
 // ツールバー機能の設定
 toolbarOptions = [
@@ -52,11 +51,6 @@ var quill = new Quill('#quill_editor', {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
-    if (location.search.match('redirect=articles_edit')) {
-        // 記事編集処理後にリダイレクトされた場合
-        alert('編集内容を保存しました');
-    }
-
     $("#title").val(title_view.innerHTML);
     $("#text").val(text_view.innerHTML);
     modal_title.value = title_view.innerHTML;
@@ -114,34 +108,24 @@ function clickModalClose() {
     quill.root.innerHTML = text_view.innerHTML;
 }
 
-function clickSubmit() {
-    switch (click_btn) {
-        case "add_article":
-            return window.confirm("この内容で記事を投稿しますか？");
-        case "edit_article":
-            return window.confirm("この内容で記事を保存しますか？");
-        case "delete_article":
-            return window.confirm("本当に削除しますか？");
-        default:
-            return false;
+function clickAddArticle() {
+    if (window.confirm("この内容で記事を投稿しますか？")) {
+        document.articles_add_form.submit();
     }
 }
 
-function clickAddArticle() {
-    click_btn = "add_article";
+function clickEditArticle(article_id) {
+    if (window.confirm("この内容で記事を保存しますか？")) {
+        document.articles_view_form.action = '/articles/edit?article_id=' + article_id;
+        document.articles_view_form.submit();
+    }
 }
 
-function clickEditArticle() {
-    click_btn = "edit_article";
-}
-
-function clickDeleteArticle() {
-    click_btn = "delete_article";
-}
-
-function clickFavorite(article_id, user_id, favorite_flg) {
-    var parm = "article_id=" + article_id + "&user_id=" + user_id + "&favorite_flg=" + favorite_flg;
-    location.href = '/favorites/edit?' + parm;
+function clickDeleteArticle(article_id) {
+    if (window.confirm("本当に削除しますか？")) {
+        document.articles_view_form.action = '/articles/delete?article_id=' + article_id;
+        document.articles_view_form.submit();
+    }
 }
 
 function clickReturn(user_id) {
