@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Cake\ORM\TableRegistry;
 use Cake\Mailer\MailerAwareTrait;
+use Cake\ORM\TableRegistry;
+use Cake\Routing\Router;
 
 /**
  * Users Controller
@@ -21,7 +22,17 @@ class UsersController extends AppController
         parent::beforeFilter($event);
         // ログインアクションを認証を必要としないように設定することで、
         // 無限リダイレクトループの問題を防ぐ
-        $this->Authentication->addUnauthenticatedActions(['view', 'add', 'delete_complete', 'login', 'logout']);
+        $this->Authentication->addUnauthenticatedActions([
+            'view',
+            'add',
+            'delete_complete',
+            'login',
+            'logout',
+            'send_reissue_password_mail',
+            'send_reissue_password_mail_complete',
+            'reissue_password',
+            'reissue_password_complete'
+        ]);
     }
 
     public function initialize(): void
@@ -31,6 +42,7 @@ class UsersController extends AppController
         $this->Articles = TableRegistry::get('articles');
         $this->Favorites = TableRegistry::get('favorites');
         $this->Follows = TableRegistry::get('follows');
+        $this->Tokens = TableRegistry::get('tokens');
     }
 
     /**
@@ -128,8 +140,13 @@ class UsersController extends AppController
     {
         if ($this->request->is('post')) {
             $user = $this->Users->newEmptyEntity();
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
+                // トークンテーブルを登録
+                $token = $this->Tokens->newEmptyEntity();
+                $this->Tokens->patchEntity($token, ['user_id' => $user->id]);
+                $this->Tokens->save($token);
+
                 // 認証設定してログイン状態にする
                 $this->Authentication->setIdentity($user);
 
@@ -271,6 +288,96 @@ class UsersController extends AppController
             $this->Authentication->logout();
             return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
+    }
+
+    /**
+     * パスワード再発行メール送信処理
+     */
+    public function send_reissue_password_mail()
+    {
+        if ($this->request->is('post')) {
+            $email = $this->request->getData('email');
+
+            $user = $this->Users->find('all', [
+                'conditions' => ['email' => $email],
+            ])->first();
+
+            if (!empty($user)) {
+                // トークンと有効期限(30分)を生成
+                $tmp_token = substr(str_shuffle('1234567890abcdefghijklmnopqrstuvwxyz'), 0, 16);
+                $limit_time = time() + 1800;
+
+                // トークンテーブルに設定
+                $token_id = $this->Tokens->find('all', [
+                    'conditions' => ['user_id' => $user->id],
+                ])->first()->id;
+                $token = $this->Tokens->get($token_id);
+                $this->Tokens->patchEntity($token, ['token' => $tmp_token, 'limit_time' => $limit_time]);
+                $this->Tokens->save($token);
+
+                // パスワード再発行画面のurlを設定
+                $url = Router::url('/users/reissue_password?ui='. $user->id . '&tk=' . $tmp_token, true);
+
+                // パスワード再発行メールを送信
+                $this->getMailer('User')->send('reissue_password', [$user, $url]);
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'send_reissue_password_mail_complete']);
+            } else {
+                $this->Flash->error(__('登録されていないメールアドレスです。'));
+            }
+        }
+    }
+
+    /**
+     * パスワード再発行メール送信処理
+     */
+    public function send_reissue_password_mail_complete()
+    {
+    }
+
+    /**
+     * パスワード再発行処理
+     */
+    public function reissue_password()
+    {
+        $params = $this->request->getQueryParams();
+        $isEnableAccess = false;
+
+        // ユーザーデータ取得
+        $user = $this->Users->get($params['ui']);
+
+        // トークンデータ取得
+        $token_id = $this->Tokens->find('all', [
+            'conditions' => ['user_id' => $user->id],
+        ])->first()->id;
+        $token = $this->Tokens->get($token_id);
+
+        // 有効なアクセスであることを判定
+        if (!empty($user) && !empty($token) && $token->token == $params['tk'] && time() < $token->limit_time) {
+            $isEnableAccess = true;
+        }
+
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            if ($data['password'] == $data['password_re']) {
+                // パスワードを更新
+                $this->Users->patchEntity($user, ['password' => $data['password']]);
+                $this->Users->save($user);
+
+                return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
+            } else {
+                $this->Flash->error(__('再入力したパスワードが間違っています。'));
+            }
+        }
+
+        $this->set(compact('isEnableAccess'));
+    }
+
+    /**
+     * パスワード再発行完了処理
+     */
+    public function reissue_password_complete()
+    {
     }
 
     /**

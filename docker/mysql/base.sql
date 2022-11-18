@@ -60,3 +60,17 @@ ALTER TABLE follows ADD CONSTRAINT fk_follower_user FOREIGN KEY (user_id) REFERE
 
 /* フォローユーザー外部キー追加 */
 ALTER TABLE follows ADD CONSTRAINT fk_follow_user FOREIGN KEY (follow_user_id) REFERENCES users (id) ON DELETE CASCADE;
+
+/* ================================================================================= */
+/* トークンテーブル追加 */
+CREATE TABLE tokens (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    token VARCHAR(255),
+    limit_time INT UNSIGNED,
+    created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+/* フォロワーユーザー外部キー追加 */
+ALTER TABLE tokens ADD CONSTRAINT fk_token_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
