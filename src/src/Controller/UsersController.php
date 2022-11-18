@@ -364,6 +364,10 @@ class UsersController extends AppController
                 $this->Users->patchEntity($user, ['password' => $data['password']]);
                 $this->Users->save($user);
 
+                // トークンテーブルを初期化
+                $this->Tokens->patchEntity($token, ['token' => null, 'limit_time' => null]);
+                $this->Tokens->save($token);
+
                 return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
             } else {
                 $this->Flash->error(__('再入力したパスワードが間違っています。'));
