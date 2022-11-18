@@ -24,4 +24,17 @@ class UserMailer extends Mailer
 
         $this->viewBuilder()->setTemplate('withdraw_mail');
 	}
+
+	public function reissue_password($user, $url)
+	{
+		$this->setProfile('default')
+		    ->setTo($user->email)
+			->setSubject('MyKijiパスワード再発行')
+            ->setviewVars([
+				'user' => $user,
+				'url' => $url
+			]);
+
+        $this->viewBuilder()->setTemplate('reissue_password_mail');
+	}
 }
