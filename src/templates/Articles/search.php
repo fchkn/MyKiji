@@ -19,7 +19,7 @@
     <div class="row py-5 justify-content-center">
         <?php if (empty($search_articles)): ?>
             <!-- 検索不一致テキスト -->
-            <h3 class="text-center text-secondary pb-5">検索<?php echo $target ?>に一致する記事はありませんでした</h3>
+            <h3 class="text-center text-secondary pb-5">検索に一致する記事はありませんでした</h3>
         <?php else: ?>
             <!-- ソートボタン -->
             <div class="mb-4">

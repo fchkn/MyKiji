@@ -1,9 +1,13 @@
 <div class="container-fluid">
     <div class="row py-4">
         <div class="col-1"></div>
-        <div class="col-2 align-self-center"><h1><a href="<?= $this->Url->build('/') ?>">MyKiji</a></h1><?php $hasAuth ?></div>
+        <div class="col-2 align-self-center">
+            <h1><a href="<?= $this->Url->build('/') ?>">MyKiji</a></h1>
+        </div>
         <div class="col-1"></div>
-        <div class="col-4 align-self-center text-center"><input type="text" class="form-control" id="search_box" onkeypress="redirectSearch()" placeholder="記事を検索"></div>
+        <div class="col-4 align-self-center text-center">
+            <input type="text" class="form-control" id="search_box" onkeypress="redirectSearch()" maxlength="70" placeholder="記事を検索">
+        </div>
         <div class="col-1"></div>
         <?php if($hasAuth): ?>
             <div class="col-3 align-self-center text-left">
@@ -19,8 +23,12 @@
                 </div>
             </div>
         <?php else: ?>
-            <div class="col-1 align-self-center text-right"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/login'" value="ログイン"/></div>
-            <div class="col-1 align-self-center text-left"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/add'" value="新規登録"/></div>
+            <div class="col-1 align-self-center text-right">
+                <input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/login'" value="ログイン"/>
+            </div>
+            <div class="col-1 align-self-center text-left">
+                <input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/add'" value="新規登録"/>
+            </div>
             <div class="col-1"></div>
         <?php endif; ?>
     </div>
