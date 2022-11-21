@@ -139,7 +139,6 @@ class UsersController extends AppController
     public function add()
     {
         $user = $this->Users->newEmptyEntity();
-        $test = $this->request->getData();
         if ($this->request->is('post')) {
             $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
@@ -262,21 +261,21 @@ class UsersController extends AppController
     public function login()
     {
         $this->request->allowMethod(['get', 'post']);
+        $user = $this->Users->newEmptyEntity();
+
         $result = $this->Authentication->getResult();
         // POSTやGETに関係なく、ユーザーがログインしていればリダイレクトする
         if ($result->isValid()) {
             // ログイン成功後に Top画面 にリダイレクトする
-            $redirect = $this->request->getQuery('redirect', [
-                'controller' => 'Top',
-                'action' => 'index',
-            ]);
-    
-            return $this->redirect($redirect);
+            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
         // ユーザーの送信と認証に失敗した場合にエラーを表示する
         if ($this->request->is('post') && !$result->isValid()) {
+            $this->Users->patchEntity($user, $this->request->getData());
             $this->Flash->error(__('メールアドレスまたはパスワードが間違っています。'));
         }
+
+        $this->set(compact('user'));
     }
 
     /**
