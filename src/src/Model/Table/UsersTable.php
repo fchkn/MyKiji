@@ -73,6 +73,15 @@ class UsersTable extends Table
                 'message' => 'パスワードは半角英数字で入力してください。']);
 
         $validator
+            ->maxLength('password_re', 20)
+            ->notEmpty('password_re', 'パスワードを入力してください。')
+            ->add('password_re', 'alphaNumeric', [
+                'rule' => ['alphaNumericCustom'], 
+                'provider' => 'custom',
+                'message' => 'パスワードは半角英数字で入力してください。'])
+            ->equalToField('password_re', 'password', '再入力したパスワードが間違っています。');
+
+        $validator
             ->email('email', false, '正しい形式でメールアドレスを入力してください。')
             ->maxLength('email', 254)
             ->notEmpty('email', 'メールアドレスを入力してください。');

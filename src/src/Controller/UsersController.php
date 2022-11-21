@@ -347,6 +347,7 @@ class UsersController extends AppController
     public function reissue_password()
     {
         $params = $this->request->getQueryParams();
+        $user_entity = $this->Users->newEmptyEntity();
         $isEnableAccess = false;
 
         // ユーザーデータ取得
@@ -368,19 +369,25 @@ class UsersController extends AppController
             if ($data['password'] == $data['password_re']) {
                 // パスワードを更新
                 $this->Users->patchEntity($user, ['password' => $data['password']]);
-                $this->Users->save($user);
+                if ($this->Users->save($user)) {
+                    // トークンテーブルを初期化
+                    $this->Tokens->patchEntity($token, ['token' => null, 'limit_time' => null]);
+                    $this->Tokens->save($token);
 
-                // トークンテーブルを初期化
-                $this->Tokens->patchEntity($token, ['token' => null, 'limit_time' => null]);
-                $this->Tokens->save($token);
-
-                return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
+                    return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
+                } else {
+                    $this->Flash->error(__('再発行ができませんでした。'));
+                }
             } else {
-                $this->Flash->error(__('再入力したパスワードが間違っています。'));
+                $this->Flash->error(__('再発行ができませんでした。'));
             }
+            $this->Users->patchEntity($user_entity, [
+                'password' => $data['password'],
+                'password_re' => $data['password_re']
+            ]);
         }
 
-        $this->set(compact('isEnableAccess'));
+        $this->set(compact('user_entity', 'isEnableAccess'));
     }
 
     /**

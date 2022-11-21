@@ -38,7 +38,11 @@ main {
 }
 
 .error-message {
-    color:#dc3545
+    color:#dc3545;
+}
+
+.error-message * li{
+    list-style-type: none;
 }
 
 .message {
