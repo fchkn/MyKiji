@@ -54,17 +54,27 @@ class UsersTable extends Table
      */
     public function validationDefault(Validator $validator): Validator
     {
+        $validator->setProvider('custom', 'App\Model\Validation\CustomValidation');
+
         $validator
             ->maxLength('name', 20)
-            ->notEmpty('name', '名前を入力してください。');
+            ->notEmpty('name', 'ユーザー名を入力してください。')
+            ->add('name', 'notSpace', [
+                'rule' => ['notSpace'], 
+                'provider' => 'custom',
+                'message' => 'ユーザー名に半角/全角スペースを含めないでください。']);
 
         $validator
-            ->maxLength('password', 255)
-            ->notEmpty('password', 'パスワードを入力してください。');
+            ->maxLength('password', 20)
+            ->notEmpty('password', 'パスワードを入力してください。')
+            ->add('password', 'alphaNumeric', [
+                'rule' => ['alphaNumericCustom'], 
+                'provider' => 'custom',
+                'message' => 'パスワードは半角英数字で入力してください。']);
 
         $validator
-            ->email('email')
-            ->maxLength('email', 255)
+            ->email('email', false, '正しい形式でメールアドレスを入力してください。')
+            ->maxLength('email', 254)
             ->notEmpty('email', 'メールアドレスを入力してください。');
 
         return $validator;
@@ -79,7 +89,8 @@ class UsersTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email', 'message' => '既に登録済みのメールアドレスです。']);
+        $rules->add($rules->isUnique(['name']), ['errorField' => 'name', 'message' => 'このユーザー名は既に登録されています。']);
+        $rules->add($rules->isUnique(['email']), ['errorField' => 'email', 'message' => 'このメールアドレスは既に登録されています。']);
 
         return $rules;
     }

@@ -138,8 +138,9 @@ class UsersController extends AppController
      */
     public function add()
     {
+        $user = $this->Users->newEmptyEntity();
+        $test = $this->request->getData();
         if ($this->request->is('post')) {
-            $user = $this->Users->newEmptyEntity();
             $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
                 // トークンテーブルを登録
@@ -160,6 +161,7 @@ class UsersController extends AppController
             }
             $this->Flash->error(__('登録ができませんでした。'));
         }
+        $this->set(compact('user'));
     }
 
     /**
