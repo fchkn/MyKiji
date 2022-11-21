@@ -296,8 +296,11 @@ class UsersController extends AppController
      */
     public function send_reissue_password_mail()
     {
+        $user_entity = $this->Users->newEmptyEntity();
+
         if ($this->request->is('post')) {
             $email = $this->request->getData('email');
+            $this->Users->patchEntity($user_entity, ['email' => $email]);
 
             $user = $this->Users->find('all', [
                 'conditions' => ['email' => $email],
@@ -327,6 +330,8 @@ class UsersController extends AppController
                 $this->Flash->error(__('登録されていないメールアドレスです。'));
             }
         }
+
+        $this->set(compact('user_entity'));
     }
 
     /**
