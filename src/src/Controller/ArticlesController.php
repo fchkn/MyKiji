@@ -77,6 +77,21 @@ class ArticlesController extends AppController
             }
         }
 
+        // 既存記事画像のファイルサイズを取得
+        $existing_imgs_size = [];
+        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+        if (file_exists($img_dir_path)) {
+            if ($handle = opendir($img_dir_path)) {
+                while(false !== ($file = readdir($handle))) {
+                    if ($file != "." && $file != "..") {
+                        $existing_imgs_size[] += filesize($img_dir_path . '/' . $file);
+                    }
+                }
+                closedir($handle);
+            }
+        }
+        $existing_imgs_size_csv = !empty($existing_imgs_size) ? implode(",", $existing_imgs_size) : "";
+
         // リダイレクトプロパティ取得
         $session = $this->getRequest()->getSession();
         $redirect = $session->read('redirect');
@@ -84,7 +99,7 @@ class ArticlesController extends AppController
             $session->delete('redirect');
         }
 
-        $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow', 'redirect'));
+        $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow', 'existing_imgs_size_csv', 'redirect'));
     }
 
     /**

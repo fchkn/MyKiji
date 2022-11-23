@@ -67,7 +67,7 @@
 </form>
 
 <!-- 記事エディタ モーダルウィンドウ -->
-<?= $this->element('article_editor_modal') ?>
+<?= $this->element('article_editor_modal', ['existing_imgs_size_csv' => ""]) ?>
 
 <?php
 echo $this->Html->css('article');

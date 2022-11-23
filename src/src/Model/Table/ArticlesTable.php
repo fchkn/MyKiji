@@ -70,7 +70,7 @@ class ArticlesTable extends Table
 
         $validator
             ->scalar('title')
-            ->maxLength('title', 255)
+            ->maxLength('title', 70)
             ->requirePresence('title', 'create')
             ->notEmptyString('title');
 
@@ -82,32 +82,32 @@ class ArticlesTable extends Table
 
         $validator
             ->scalar('tag_1')
-            ->maxLength('tag_1', 255)
+            ->maxLength('tag_1', 20)
             ->allowEmptyString('tag_1');
 
         $validator
             ->scalar('tag_2')
-            ->maxLength('tag_2', 255)
+            ->maxLength('tag_2', 20)
             ->allowEmptyString('tag_2');
 
         $validator
             ->scalar('tag_3')
-            ->maxLength('tag_3', 255)
+            ->maxLength('tag_3', 20)
             ->allowEmptyString('tag_3');
 
         $validator
             ->scalar('tag_4')
-            ->maxLength('tag_4', 255)
+            ->maxLength('tag_4', 20)
             ->allowEmptyString('tag_4');
 
         $validator
             ->scalar('tag_5')
-            ->maxLength('tag_5', 255)
+            ->maxLength('tag_5', 20)
             ->allowEmptyString('tag_5');
 
         $validator
             ->scalar('tag_6')
-            ->maxLength('tag_6', 255)
+            ->maxLength('tag_6', 20)
             ->allowEmptyString('tag_6');
 
         return $validator;
