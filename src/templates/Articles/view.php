@@ -106,7 +106,7 @@
     <!-- 記事タイトル -->
     <div class="row py-3">
         <div class="col-12">
-            <input type="text" id="title" name="title" style="display:none"></input>
+            <input type="text" id="title" name="title" value="<?php echo $article->title ?>" style="display:none"></input>
             <h1 class="m-0" id ='title_view'><?php echo $article->title ?></h1>
         </div>
     </div>
@@ -116,7 +116,7 @@
         <div class="col-12">
             <?php for ($i = 1; $i <= 6; $i++) : ?>
                 <span class="pr-1">
-                    <input type="text" id="tag_<?php echo $i ?>" name="tag_<?php echo $i ?>" style="display:none">
+                    <input type="text" id="tag_<?php echo $i ?>" name="tag_<?php echo $i ?>" value="<?php echo $article->{"tag_" . $i} ?>" style="display:none">
                     <?php if (!empty($article->{"tag_" . $i})): ?>
                         <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_<?php echo $i ?>_view" onclick="location.href='/articles/search?tag=<?php echo $article->{'tag_' . $i} ?>'"><?php echo $article->{"tag_" . $i} ?></button>
                     <?php else: ?>
@@ -130,7 +130,7 @@
     <!-- 記事本文 -->
     <div class="row pb-5">
         <div class="col-12 ql-container ql-snow">
-            <textarea id="text" name="text" style="display:none"></textarea>
+            <textarea id="text" name="text" style="display:none"><?php echo $article->text ?></textarea>
             <div class="ql-editor" id ='text_view'><?php echo $article->text ?></div>
         </div>
     </div>

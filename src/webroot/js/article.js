@@ -1,10 +1,3 @@
-document.addEventListener("DOMContentLoaded", function() {
-    var title_view = document.getElementById("title_view");
-    var text_view = document.getElementById("text_view");
-    $("#title").val(title_view.innerHTML);
-    $("#text").val(text_view.innerHTML);
-});
-
 function clickAddArticle() {
     if (window.confirm("この内容で記事を投稿しますか？")) {
         document.articles_add_form.submit();
