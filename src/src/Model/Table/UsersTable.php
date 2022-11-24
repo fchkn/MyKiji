@@ -60,7 +60,7 @@ class UsersTable extends Table
             ->maxLength('name', 20)
             ->notEmpty('name', 'ユーザー名を入力してください。')
             ->add('name', 'notSpace', [
-                'rule' => ['notSpace'], 
+                'rule' => ['notSpace'],
                 'provider' => 'custom',
                 'message' => 'ユーザー名に半角/全角スペースを含めないでください。']);
 
@@ -68,7 +68,7 @@ class UsersTable extends Table
             ->maxLength('password', 20)
             ->notEmpty('password', 'パスワードを入力してください。')
             ->add('password', 'alphaNumeric', [
-                'rule' => ['alphaNumericCustom'], 
+                'rule' => ['alphaNumericCustom'],
                 'provider' => 'custom',
                 'message' => 'パスワードは半角英数字で入力してください。']);
 
@@ -76,10 +76,22 @@ class UsersTable extends Table
             ->maxLength('password_re', 20)
             ->notEmpty('password_re', 'パスワードを入力してください。')
             ->add('password_re', 'alphaNumeric', [
-                'rule' => ['alphaNumericCustom'], 
+                'rule' => ['alphaNumericCustom'],
                 'provider' => 'custom',
                 'message' => 'パスワードは半角英数字で入力してください。'])
             ->equalToField('password_re', 'password', '再入力したパスワードが間違っています。');
+
+        $validator
+            ->maxLength('password_curt', 20)
+            ->notEmpty('password_curt', 'パスワードを入力してください。')
+            ->add('password_curt', 'alphaNumeric', [
+                'rule' => ['alphaNumericCustom'],
+                'provider' => 'custom',
+                'message' => 'パスワードは半角英数字で入力してください。'])
+            ->add('password_curt', 'matchCurrentPassword', [
+                'rule' => ['matchCurrentPassword'],
+                'provider' => 'custom',
+                'message' => '現在のパスワードが間違っています。']);
 
         $validator
             ->email('email', false, '正しい形式でメールアドレスを入力してください。')

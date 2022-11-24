@@ -175,37 +175,66 @@ class UsersController extends AppController
      */
     public function edit()
     {
+        $user = $this->Users->newEmptyEntity();
+
         if ($this->request->is('post')) {
             $user = $this->Users->get($this->auth_user->id);
             $data = $this->request->getData();
 
-            if (isset($data['edit_profileinfo'])) {
-                // プロフィール画像変更
-                if (!empty($data['profile_img']->getClientFilename())) {
-                    $this->saveProfileImg($data['profile_img'], $user->id);
-                }
-
-                // ユーザー名変更
-                $this->Users->patchEntity($user, ['name' => $data['name']]);
-            } else if (isset($data['edit_email'])) {
-                // メールアドレス変更
-                $this->Users->patchEntity($user, ['email' => $data['email']]);
-            } else if (isset($data['edit_password'])) {
-                // パスワード変更
-                $this->Users->patchEntity($user, ['password' => $data['password_new']]);
+            switch ($data['edit_target']) {
+                case 'profileinfo' :
+                    // ユーザー名変更
+                    $this->Users->patchEntity($user, ['name' => $data['name']]);
+                    break;
+                case 'email' :
+                    // メールアドレス変更
+                    $this->Users->patchEntity($user, ['email' => $data['email']]);
+                    break;
+                case 'password' :
+                    // パスワード変更
+                    $this->Users->patchEntity($user, [
+                        'password' => $data['password'],
+                        'password_re' => $data['password_re'],
+                        'password_curt' => $data['password_curt'],
+                        'password_curt_registered' => $this->auth_user->password
+                    ]);
+                    break;
             }
 
             // テーブルを更新
             if ($this->Users->save($user)) {
+                // プロフィール画像を変更
+                if ($data['edit_target'] == "profileinfo" &&
+                    !empty($data['profile_img']->getClientFilename())) {
+                    $this->saveProfileImg($data['profile_img'], $user->id);
+                }
                 // 認証を再設定
                 $this->Authentication->setIdentity($user);
-                $auth_user = $this->Authentication->getIdentity();
-                $this->set(compact('auth_user'));
-                echo '<script>alert("変更しました。")</script>';
+
+                // 変更保存完了ポップアップの判定パラメータをセッションに格納
+                $session = $this->getRequest()->getSession();
+                $session->write('redirect', 'users_edit');
+
+                // ページを更新
+                return $this->redirect($this->request->referer());
             } else {
-                $this->Flash->error(__('変更に失敗しました。'));
+                $this->Flash->error(__('変更を保存できませんでした。'));
             }
+        } else {
+            $this->Users->patchEntity($user, [
+                'name' => $this->auth_user->name,
+                'email' => $this->auth_user->email,
+            ]);
         }
+
+        // リダイレクトプロパティ取得
+        $session = $this->getRequest()->getSession();
+        $redirect = $session->read('redirect');
+        if (!empty($redirect)) {
+            $session->delete('redirect');
+        }
+
+        $this->set(compact('user', 'redirect'));
     }
 
     /**
