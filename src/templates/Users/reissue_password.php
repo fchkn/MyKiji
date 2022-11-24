@@ -4,7 +4,7 @@
  * @var iterable<\App\Model\Entity\User> $users
  */
 ?>
-<?= $this->Form->create($user_entity) ?>
+<?= $this->Form->create($user) ?>
 <div class="container-fluid">
     <div class="row py-5">
         <div class="col-12 align-self-center text-center text-secondary">
