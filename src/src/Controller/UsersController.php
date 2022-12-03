@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Datasource\ConnectionManager;
 use Cake\Mailer\MailerAwareTrait;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -139,26 +140,67 @@ class UsersController extends AppController
     public function add()
     {
         $user = $this->Users->newEmptyEntity();
+
         if ($this->request->is('post')) {
-            $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
+
+            try {
+                // ユーザデータを登録
+                $this->Users->patchEntity($user, $this->request->getData());
+                $this->Users->saveOrFail($user);
+
                 // トークンテーブルを登録
                 $token = $this->Tokens->newEmptyEntity();
                 $this->Tokens->patchEntity($token, ['user_id' => $user->id]);
-                $this->Tokens->save($token);
-
-                // 認証設定してログイン状態にする
-                $this->Authentication->setIdentity($user);
+                $this->Tokens->saveOrFail($token);
 
                 // プロフィール画像にデフォルトアイコンを設定
-                copy(WWW_ROOT . 'img/default_icon.jpg', UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
+                if(!copy(WWW_ROOT . 'img/default_icon.jpg', UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg')){
+                    throw new \Exception('プロフィール画像の作成に失敗しました。', 500);
+                }
 
                 // 登録完了メールを送信
                 $this->getMailer('User')->send('register', [$user]);
 
+                // 認証設定してログイン状態にする
+                $this->Authentication->setIdentity($user);
+
+                // コミット
+                $connection->commit();
+
                 return $this->redirect(['controller' => 'Users', 'action' => 'add_complete']);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('登録ができませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // プロフィール画像削除
+                $img_path = UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg';
+                if (file_exists($img_path)) {
+                    unlink($img_path);
+                }
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatusCode: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "FilePath: " . $e->getFile() . "\t" . $e->getLine(),
+                    "StackTrace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
-            $this->Flash->error(__('登録ができませんでした。'));
         }
         $this->set(compact('user'));
     }
