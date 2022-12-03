@@ -54,17 +54,48 @@ class UsersTable extends Table
      */
     public function validationDefault(Validator $validator): Validator
     {
+        $validator->setProvider('custom', 'App\Model\Validation\CustomValidation');
+
         $validator
             ->maxLength('name', 20)
-            ->notEmpty('name', '名前を入力してください。');
+            ->notEmpty('name', 'ユーザー名を入力してください。')
+            ->add('name', 'notSpace', [
+                'rule' => ['notSpace'],
+                'provider' => 'custom',
+                'message' => 'ユーザー名に半角/全角スペースを含めないでください。']);
 
         $validator
-            ->maxLength('password', 255)
-            ->notEmpty('password', 'パスワードを入力してください。');
+            ->maxLength('password', 20)
+            ->notEmpty('password', 'パスワードを入力してください。')
+            ->add('password', 'alphaNumeric', [
+                'rule' => ['alphaNumericCustom'],
+                'provider' => 'custom',
+                'message' => 'パスワードは半角英数字で入力してください。']);
 
         $validator
-            ->email('email')
-            ->maxLength('email', 255)
+            ->maxLength('password_re', 20)
+            ->notEmpty('password_re', 'パスワードを入力してください。')
+            ->add('password_re', 'alphaNumeric', [
+                'rule' => ['alphaNumericCustom'],
+                'provider' => 'custom',
+                'message' => 'パスワードは半角英数字で入力してください。'])
+            ->equalToField('password_re', 'password', '再入力したパスワードが間違っています。');
+
+        $validator
+            ->maxLength('password_curt', 20)
+            ->notEmpty('password_curt', 'パスワードを入力してください。')
+            ->add('password_curt', 'alphaNumeric', [
+                'rule' => ['alphaNumericCustom'],
+                'provider' => 'custom',
+                'message' => 'パスワードは半角英数字で入力してください。'])
+            ->add('password_curt', 'matchCurrentPassword', [
+                'rule' => ['matchCurrentPassword'],
+                'provider' => 'custom',
+                'message' => '現在のパスワードが間違っています。']);
+
+        $validator
+            ->email('email', false, '正しい形式でメールアドレスを入力してください。')
+            ->maxLength('email', 254)
             ->notEmpty('email', 'メールアドレスを入力してください。');
 
         return $validator;
@@ -79,7 +110,8 @@ class UsersTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email', 'message' => '既に登録済みのメールアドレスです。']);
+        $rules->add($rules->isUnique(['name']), ['errorField' => 'name', 'message' => 'このユーザー名は既に登録されています。']);
+        $rules->add($rules->isUnique(['email']), ['errorField' => 'email', 'message' => 'このメールアドレスは既に登録されています。']);
 
         return $rules;
     }

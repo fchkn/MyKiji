@@ -4,13 +4,11 @@
  * @var iterable<\App\Model\Entity\User> $users
  */
 ?>
-<?= $this->Flash->render() ?>
-<form method="post">
+<?= $this->Form->create($user_entity) ?>
 <div class="container-fluid">
     <div class="row py-5">
         <div class="col-12 align-self-center text-center text-secondary">
             <h2>パスワード再発行<h2>
-            <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
         </div>
     </div>
     <div class="row pb-5">
@@ -19,12 +17,23 @@
             <p class="mb-1">送信ボタンからパスワード再発行メールをお送りします。</p>
             <p>メール内容に従って再発行を行ってください。</p>
         </div>
-        <div class="col-12 mb-4 align-self-center">
-            <input type="text" class="form-control mx-auto" name="email" placeholder="メールアドレス" style="max-width:500px;">
+        <div class="col-12 mb-4 align-self-center text-center">
+            <!-- メールアドレス入力欄 -->
+            <?= $this->Form->text('email', [
+                'class' => 'form-control mx-auto',
+                'style' => 'max-width:500px;',
+                'placeholder' => 'メールアドレス'
+            ]) ?>
+            <?= $this->Form->error('email') ?>
         </div>
         <div class="col-12 my-4 align-self-center text-center">
-            <input type="submit" class="btn btn-secondary btn-lg" value="&emsp;送信&emsp;"/>
+            <!-- 送信ボタン -->
+            <?= $this->Form->button('　送信　', [
+                'class' => 'btn btn-secondary btn-lg',
+                'type' => 'button',
+                'onclick'=>'submit()'
+            ]) ?>
         </div>
     </div>
 </div>
-</form>
+<?= $this->Form->end() ?>

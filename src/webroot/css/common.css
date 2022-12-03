@@ -36,3 +36,29 @@ main {
 .list-group {
     width:800px;
 }
+
+.error-message {
+    color:#dc3545;
+}
+
+.error-message * li{
+    list-style-type: none;
+}
+
+.message {
+    padding: 1rem;
+    background: #eff8ff;
+    color: #2779bd;
+    border-color: #6cb2eb;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.message.error {
+    background: #fcebea;
+    color: #cc1f1a;
+    border-color: #ef5753;
+}

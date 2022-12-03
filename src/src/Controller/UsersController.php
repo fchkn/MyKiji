@@ -138,8 +138,8 @@ class UsersController extends AppController
      */
     public function add()
     {
+        $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
-            $user = $this->Users->newEmptyEntity();
             $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
                 // トークンテーブルを登録
@@ -160,6 +160,7 @@ class UsersController extends AppController
             }
             $this->Flash->error(__('登録ができませんでした。'));
         }
+        $this->set(compact('user'));
     }
 
     /**
@@ -174,37 +175,66 @@ class UsersController extends AppController
      */
     public function edit()
     {
+        $user = $this->Users->newEmptyEntity();
+
         if ($this->request->is('post')) {
             $user = $this->Users->get($this->auth_user->id);
             $data = $this->request->getData();
 
-            if (isset($data['edit_profileinfo'])) {
-                // プロフィール画像変更
-                if (!empty($data['profile_img']->getClientFilename())) {
-                    $this->saveProfileImg($data['profile_img'], $user->id);
-                }
-
-                // ユーザー名変更
-                $this->Users->patchEntity($user, ['name' => $data['name']]);
-            } else if (isset($data['edit_email'])) {
-                // メールアドレス変更
-                $this->Users->patchEntity($user, ['email' => $data['email']]);
-            } else if (isset($data['edit_password'])) {
-                // パスワード変更
-                $this->Users->patchEntity($user, ['password' => $data['password_new']]);
+            switch ($data['edit_target']) {
+                case 'profileinfo' :
+                    // ユーザー名変更
+                    $this->Users->patchEntity($user, ['name' => $data['name']]);
+                    break;
+                case 'email' :
+                    // メールアドレス変更
+                    $this->Users->patchEntity($user, ['email' => $data['email']]);
+                    break;
+                case 'password' :
+                    // パスワード変更
+                    $this->Users->patchEntity($user, [
+                        'password' => $data['password'],
+                        'password_re' => $data['password_re'],
+                        'password_curt' => $data['password_curt'],
+                        'password_curt_registered' => $this->auth_user->password
+                    ]);
+                    break;
             }
 
             // テーブルを更新
             if ($this->Users->save($user)) {
+                // プロフィール画像を変更
+                if ($data['edit_target'] == "profileinfo" &&
+                    !empty($data['profile_img']->getClientFilename())) {
+                    $this->saveProfileImg($data['profile_img'], $user->id);
+                }
                 // 認証を再設定
                 $this->Authentication->setIdentity($user);
-                $auth_user = $this->Authentication->getIdentity();
-                $this->set(compact('auth_user'));
-                echo '<script>alert("変更しました。")</script>';
+
+                // 変更保存完了ポップアップの判定パラメータをセッションに格納
+                $session = $this->getRequest()->getSession();
+                $session->write('redirect', 'users_edit');
+
+                // ページを更新
+                return $this->redirect($this->request->referer());
             } else {
-                $this->Flash->error(__('変更に失敗しました。'));
+                $this->Flash->error(__('変更を保存できませんでした。'));
             }
+        } else {
+            $this->Users->patchEntity($user, [
+                'name' => $this->auth_user->name,
+                'email' => $this->auth_user->email,
+            ]);
         }
+
+        // リダイレクトプロパティ取得
+        $session = $this->getRequest()->getSession();
+        $redirect = $session->read('redirect');
+        if (!empty($redirect)) {
+            $session->delete('redirect');
+        }
+
+        $this->set(compact('user', 'redirect'));
     }
 
     /**
@@ -260,21 +290,21 @@ class UsersController extends AppController
     public function login()
     {
         $this->request->allowMethod(['get', 'post']);
+        $user = $this->Users->newEmptyEntity();
+
         $result = $this->Authentication->getResult();
         // POSTやGETに関係なく、ユーザーがログインしていればリダイレクトする
         if ($result->isValid()) {
             // ログイン成功後に Top画面 にリダイレクトする
-            $redirect = $this->request->getQuery('redirect', [
-                'controller' => 'Top',
-                'action' => 'index',
-            ]);
-    
-            return $this->redirect($redirect);
+            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
         }
         // ユーザーの送信と認証に失敗した場合にエラーを表示する
         if ($this->request->is('post') && !$result->isValid()) {
+            $this->Users->patchEntity($user, $this->request->getData());
             $this->Flash->error(__('メールアドレスまたはパスワードが間違っています。'));
         }
+
+        $this->set(compact('user'));
     }
 
     /**
@@ -295,8 +325,11 @@ class UsersController extends AppController
      */
     public function send_reissue_password_mail()
     {
+        $user_entity = $this->Users->newEmptyEntity();
+
         if ($this->request->is('post')) {
             $email = $this->request->getData('email');
+            $this->Users->patchEntity($user_entity, ['email' => $email]);
 
             $user = $this->Users->find('all', [
                 'conditions' => ['email' => $email],
@@ -326,6 +359,8 @@ class UsersController extends AppController
                 $this->Flash->error(__('登録されていないメールアドレスです。'));
             }
         }
+
+        $this->set(compact('user_entity'));
     }
 
     /**
@@ -355,26 +390,28 @@ class UsersController extends AppController
         // 有効なアクセスであることを判定
         if (!empty($user) && !empty($token) && $token->token == $params['tk'] && time() < $token->limit_time) {
             $isEnableAccess = true;
-        }
 
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-            if ($data['password'] == $data['password_re']) {
+            if ($this->request->is('post')) {
+                $data = $this->request->getData();
                 // パスワードを更新
-                $this->Users->patchEntity($user, ['password' => $data['password']]);
-                $this->Users->save($user);
+                $this->Users->patchEntity($user, [
+                    'password' => $data['password'],
+                    'password_re' => $data['password_re']]);
+                if ($this->Users->save($user)) {
+                    // トークンテーブルを初期化
+                    $this->Tokens->patchEntity($token, ['token' => null, 'limit_time' => null]);
+                    $this->Tokens->save($token);
 
-                // トークンテーブルを初期化
-                $this->Tokens->patchEntity($token, ['token' => null, 'limit_time' => null]);
-                $this->Tokens->save($token);
-
-                return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
+                    return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
+                } else {
+                    $this->Flash->error(__('再発行ができませんでした。'));
+                }
             } else {
-                $this->Flash->error(__('再入力したパスワードが間違っています。'));
+                $user = $this->Users->newEmptyEntity();
             }
         }
 
-        $this->set(compact('isEnableAccess'));
+        $this->set(compact('user', 'isEnableAccess'));
     }
 
     /**
