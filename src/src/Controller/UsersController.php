@@ -192,10 +192,10 @@ class UsersController extends AppController
 
                 // エラーログを出力
                 $error = implode("\n", [
-                    "\nStatusCode: " . $e->getCode(),
+                    "\nStatus Code: " . $e->getCode(),
                     "Message: " . $e->getMessage(),
-                    "FilePath: " . $e->getFile() . "\t" . $e->getLine(),
-                    "StackTrace:\n" . $e->getTraceAsString()
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
                 ]);
                 $this->log($error);
 
@@ -220,37 +220,44 @@ class UsersController extends AppController
         $user = $this->Users->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $user = $this->Users->get($this->auth_user->id);
-            $data = $this->request->getData();
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            switch ($data['edit_target']) {
-                case 'profileinfo' :
-                    // ユーザー名変更
-                    $this->Users->patchEntity($user, ['name' => $data['name']]);
-                    break;
-                case 'email' :
-                    // メールアドレス変更
-                    $this->Users->patchEntity($user, ['email' => $data['email']]);
-                    break;
-                case 'password' :
-                    // パスワード変更
-                    $this->Users->patchEntity($user, [
-                        'password' => $data['password'],
-                        'password_re' => $data['password_re'],
-                        'password_curt' => $data['password_curt'],
-                        'password_curt_registered' => $this->auth_user->password
-                    ]);
-                    break;
-            }
+            try {
+                $user = $this->Users->get($this->auth_user->id);
+                $data = $this->request->getData();
 
-            // テーブルを更新
-            if ($this->Users->save($user)) {
+                switch ($data['edit_target']) {
+                    case 'profileinfo' :
+                        // ユーザー名変更
+                        $this->Users->patchEntity($user, ['name' => $data['name']]);
+                        break;
+                    case 'email' :
+                        // メールアドレス変更
+                        $this->Users->patchEntity($user, ['email' => $data['email']]);
+                        break;
+                    case 'password' :
+                        // パスワード変更
+                        $this->Users->patchEntity($user, [
+                            'password' => $data['password'],
+                            'password_re' => $data['password_re'],
+                            'password_curt' => $data['password_curt'],
+                            'password_curt_registered' => $this->auth_user->password
+                        ]);
+                        break;
+                }
+
+                // ユーザーデータを更新
+                $this->Users->saveOrFail($user);
+
                 // プロフィール画像を変更
                 if ($data['edit_target'] == "profileinfo" &&
                     !empty($data['profile_img']->getClientFilename())) {
                     $this->saveProfileImg($data['profile_img'], $user->id);
                 }
-                // 認証を再設定
+
+                // ログイン認証を再設定
                 $this->Authentication->setIdentity($user);
 
                 // 変更保存完了ポップアップの判定パラメータをセッションに格納
@@ -259,8 +266,29 @@ class UsersController extends AppController
 
                 // ページを更新
                 return $this->redirect($this->request->referer());
-            } else {
-                $this->Flash->error(__('変更を保存できませんでした。'));
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('変更ができませんでした。'));
+            }  catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
         } else {
             $this->Users->patchEntity($user, [
@@ -474,6 +502,14 @@ class UsersController extends AppController
         $file = $profile_img->getStream()->getMetadata('uri');
         $type = $profile_img->getClientMediaType();
 
+        // 元画像のバックアップを作成
+        $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
+        $profile_img_backup_path = UPLOAD_PROFILE_IMG_PATH . 'user_' . $user_id .  '_backup.jpg';
+        copy($profile_img_path, $profile_img_backup_path);
+        if(!copy($profile_img_path, $profile_img_backup_path)){
+            throw new \Exception('プロフィール画像のバックアップ作成に失敗しました。', 500);
+        }
+
         // 元画像のファイルデータを作成
         $src_img = null;
         if ($type == 'image/jpg' || $type == 'image/jpeg') {
@@ -505,9 +541,17 @@ class UsersController extends AppController
         // 新規画像にプロフィール画像を貼付け
         imagecopyresampled($dst_img, $src_img, 0, 0, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
 
-        // 成型したプロフィール画像を保存
-        $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
-        imagejpeg($dst_img, $profile_img_path);
+        // プロフィール画像を保存
+        if(imagejpeg($dst_img, $profile_img_path)) {
+            // バックアップを削除
+            unlink($profile_img_backup_path);
+        } else {
+            // バックアップを元画像にコピー
+            !copy($profile_img_backup_path, $profile_img_path);
+            // バックアップを削除
+            unlink($profile_img_backup_path);
+            throw new \Exception('プロフィール画像変更に失敗しました。', 500);
+        }
 
         // リソースを解放
         imagedestroy($src_img);
