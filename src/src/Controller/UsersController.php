@@ -535,40 +535,74 @@ class UsersController extends AppController
     public function reissue_password()
     {
         $params = $this->request->getQueryParams();
+        $user = null;
         $isEnableAccess = false;
 
-        // ユーザーデータ取得
-        $user = $this->Users->get($params['ui']);
+        // トランザクション開始
+        $connection = ConnectionManager::get('default');
+        $connection->begin();
 
-        // トークンデータ取得
-        $token_id = $this->Tokens->find('all', [
-            'conditions' => ['user_id' => $user->id],
-        ])->first()->id;
-        $token = $this->Tokens->get($token_id);
+        try {
+            // ユーザーデータ取得
+            $user = $this->Users->get($params['ui']);
 
-        // 有効なアクセスであることを判定
-        if (!empty($user) && !empty($token) && $token->token == $params['tk'] && time() < $token->limit_time) {
-            $isEnableAccess = true;
+            // トークンデータ取得
+            $token_id = $this->Tokens->find('all', [
+                'conditions' => ['user_id' => $user->id],
+            ])->first()->id;
+            $token = $this->Tokens->get($token_id);
 
-            if ($this->request->is('post')) {
-                $data = $this->request->getData();
-                // パスワードを更新
-                $this->Users->patchEntity($user, [
-                    'password' => $data['password'],
-                    'password_re' => $data['password_re']]);
-                if ($this->Users->save($user)) {
+            // 有効なアクセスであることを判定
+            if (!empty($user) && !empty($token) && $token->token == $params['tk'] && time() < $token->limit_time) {
+                $isEnableAccess = true;
+
+                if ($this->request->is('post')) {
+                    $data = $this->request->getData();
+
+                    // パスワードを更新
+                    $this->Users->patchEntity($user, [
+                        'password' => $data['password'],
+                        'password_re' => $data['password_re']]);
+                    $this->Users->saveOrFail($user);
+
                     // トークンテーブルを初期化
                     $this->Tokens->patchEntity($token, ['token' => null, 'limit_time' => null]);
-                    $this->Tokens->save($token);
+                    $this->Tokens->saveOrFail($token);
+
+                    // コミット
+                    $connection->commit();
 
                     return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
                 } else {
-                    $this->Flash->error(__('再発行ができませんでした。'));
+                    $user = $this->Users->newEmptyEntity();
                 }
-            } else {
-                $user = $this->Users->newEmptyEntity();
             }
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            // バリデーション違反時の例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            $this->Flash->error(__('再発行ができませんでした。'));
+        } catch (\Exception $e) {
+            // その他例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+
+            $this->Flash->error(__('異常なエラーが発生しました。'));
         }
+
+
 
         $this->set(compact('user', 'isEnableAccess'));
     }
