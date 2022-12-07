@@ -52,71 +52,82 @@ class UsersController extends AppController
     public function view() {
         $user_id = $this->request->getQuery('user_id');
         $user = null;
+        $post_articles = null;
+        $favorites = null;
+        $follows = null;
+        $followers = null;
+        $hasFollow = false;
+        $hasPaginator = true;
 
-        // ユーザーデータ取得
-        if (!empty($user_id) && is_numeric($user_id)) {
-            $user = $this->Users->findById($user_id)->first();
+        try {
+            // ユーザーデータ取得
+            if (!empty($user_id) && is_numeric($user_id)) {
+                $user = $this->Users->findById($user_id)->first();
 
-            if (is_null($user)) {
-                // 存在しないユーザーの場合はトップ画面に遷移させる
+                if (is_null($user)) {
+                    // 存在しないユーザーの場合はトップ画面に遷移させる
+                    return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+                }
+            } else {
+                // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
                 return $this->redirect(['controller' => 'Top', 'action' => 'index']);
             }
-        } else {
-            // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
-            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
-        }
 
-        // 投稿記事データ取得
-        $post_articles = $this->paginate($this->Articles->find('all', [
-            'conditions' => ['articles.user_id' => $user_id],
-            'contain' => ['Users'],
-            'order' => ['articles.created' => 'desc'],
-        ]), ['limit' => 5, 'scope' => 'articles'])->toArray();
-        $this->set(compact('post_articles'));
+            // 投稿記事データ取得
+            $post_articles = $this->paginate($this->Articles->find('all', [
+                'conditions' => ['articles.user_id' => $user_id],
+                'contain' => ['Users'],
+                'order' => ['articles.created' => 'desc'],
+            ]), ['limit' => 5, 'scope' => 'articles'])->toArray();
 
-        // お気に入りデータ取得
-        $favorites = $this->paginate($this->Favorites->find('all', [
-            'conditions' => ['favorites.user_id' => $user_id],
-            'contain' => ['Articles.Users'],
-            'order' => ['favorites.created' => 'desc'],
-        ]), ['limit' => 5,'scope' => 'favorites'])->toArray();
-        $this->set(compact('favorites'));
+            // お気に入りデータ取得
+            $favorites = $this->paginate($this->Favorites->find('all', [
+                'conditions' => ['favorites.user_id' => $user_id],
+                'contain' => ['Articles.Users'],
+                'order' => ['favorites.created' => 'desc'],
+            ]), ['limit' => 5,'scope' => 'favorites'])->toArray();
 
-        // Followsのエイリアス名を一時退避
-        $tmpAlias = $this->Follows->getAlias();
+            // Followsのエイリアス名を一時退避
+            $tmpAlias = $this->Follows->getAlias();
 
-        // フォローデータ取得
-        $follows = $this->paginate($this->Follows->setAlias('follows')->find('all', [
-            'conditions' => ['follows.user_id' => $user_id],
-            'contain' => ['FollowUsers'],
-            'order' => ['follows.created' => 'desc'],
-        ]), ['limit' => 10, 'scope' => 'follows'])->toArray();
-        $this->set(compact('follows'));
+            // フォローデータ取得
+            $follows = $this->paginate($this->Follows->setAlias('follows')->find('all', [
+                'conditions' => ['follows.user_id' => $user_id],
+                'contain' => ['FollowUsers'],
+                'order' => ['follows.created' => 'desc'],
+            ]), ['limit' => 10, 'scope' => 'follows'])->toArray();
 
-        // フォロワーデータ取得
-        $followers = $this->paginate($this->Follows->setAlias('followers')->find('all', [
-            'conditions' => ['followers.follow_user_id' => $user_id],
-            'contain' => ['FollowerUsers'],
-            'order' => ['followers.created' => 'desc'],
-        ]), ['limit' => 10, 'scope' => 'followers'])->toArray();
-        $this->set(compact('followers'));
+            // フォロワーデータ取得
+            $followers = $this->paginate($this->Follows->setAlias('followers')->find('all', [
+                'conditions' => ['followers.follow_user_id' => $user_id],
+                'contain' => ['FollowerUsers'],
+                'order' => ['followers.created' => 'desc'],
+            ]), ['limit' => 10, 'scope' => 'followers'])->toArray();
 
-        // Followsのエイリアス名を元に戻す
-        $this->Follows->setAlias($tmpAlias);
+            // Followsのエイリアス名を元に戻す
+            $this->Follows->setAlias($tmpAlias);
 
-        // ログインユーザーがフォロー中か確認
-        $hasFollow = false;
-        if ($this->hasAuth) {
-            $follow = $this->Follows->find()->where([
-                'user_id' => $this->auth_user->id,
-                'follow_user_id' => $user_id])->first();
-            if(!empty($follow)) {
-                $hasFollow = true;
+            // ログインユーザーがフォロー中か確認
+            if ($this->hasAuth) {
+                $follow = $this->Follows->find()->where([
+                    'user_id' => $this->auth_user->id,
+                    'follow_user_id' => $user_id])->first();
+                if(!empty($follow)) {
+                    $hasFollow = true;
+                }
             }
-        }
+        } catch (\Exception $e) {
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
 
-        // ページネーション要否
-        $hasPaginator = true;
+            $this->Flash->error(__('異常なエラーが発生しました。'));
+        }
 
         // マイページ判定
         $isMypage = false;
@@ -131,7 +142,17 @@ class UsersController extends AppController
             $session->delete('redirect');
         }
 
-        $this->set(compact('user', 'post_articles', 'hasFollow', 'hasPaginator', 'isMypage', 'redirect'));
+        $this->set(compact(
+            'user',
+            'post_articles',
+            'favorites',
+            'follows',
+            'followers',
+            'hasFollow',
+            'hasPaginator',
+            'isMypage',
+            'redirect'
+        ));
     }
 
     /**
