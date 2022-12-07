@@ -673,6 +673,9 @@ class UsersController extends AppController
             !copy($profile_img_backup_path, $profile_img_path);
             // バックアップを削除
             unlink($profile_img_backup_path);
+            // リソースを解放
+            imagedestroy($src_img);
+            imagedestroy($dst_img);
             throw new \Exception('プロフィール画像変更に失敗しました。', 500);
         }
 
