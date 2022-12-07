@@ -453,35 +453,69 @@ class UsersController extends AppController
         $user_entity = $this->Users->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $email = $this->request->getData('email');
-            $this->Users->patchEntity($user_entity, ['email' => $email]);
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            $user = $this->Users->find('all', [
-                'conditions' => ['email' => $email],
-            ])->first();
+            try {
+                $email = $this->request->getData('email');
+                $this->Users->patchEntity($user_entity, ['email' => $email]);
 
-            if (!empty($user)) {
-                // トークンと有効期限(30分)を生成
-                $tmp_token = substr(str_shuffle('1234567890abcdefghijklmnopqrstuvwxyz'), 0, 16);
-                $limit_time = time() + 1800;
+                $user = $this->Users->find('all', [
+                    'conditions' => ['email' => $email],
+                ])->first();
 
-                // トークンテーブルに設定
-                $token_id = $this->Tokens->find('all', [
-                    'conditions' => ['user_id' => $user->id],
-                ])->first()->id;
-                $token = $this->Tokens->get($token_id);
-                $this->Tokens->patchEntity($token, ['token' => $tmp_token, 'limit_time' => $limit_time]);
-                $this->Tokens->save($token);
+                if (!empty($user)) {
+                    // トークンと有効期限(30分)を生成
+                    $tmp_token = substr(str_shuffle('1234567890abcdefghijklmnopqrstuvwxyz'), 0, 16);
+                    $limit_time = time() + 1800;
 
-                // パスワード再発行画面のurlを設定
-                $url = Router::url('/users/reissue_password?ui='. $user->id . '&tk=' . $tmp_token, true);
+                    // トークンテーブルに設定
+                    $token_id = $this->Tokens->find('all', [
+                        'conditions' => ['user_id' => $user->id],
+                    ])->first()->id;
+                    $token = $this->Tokens->get($token_id);
+                    $this->Tokens->patchEntity($token, ['token' => $tmp_token, 'limit_time' => $limit_time]);
+                    $this->Tokens->saveOrFail($token);
 
-                // パスワード再発行メールを送信
-                $this->getMailer('User')->send('reissue_password', [$user, $url]);
+                    // パスワード再発行画面のurlを設定
+                    $url = Router::url('/users/reissue_password?ui='. $user->id . '&tk=' . $tmp_token, true);
 
-                return $this->redirect(['controller' => 'Users', 'action' => 'send_reissue_password_mail_complete']);
-            } else {
-                $this->Flash->error(__('登録されていないメールアドレスです。'));
+                    // パスワード再発行メールを送信
+                    $this->getMailer('User')->send('reissue_password', [$user, $url]);
+
+                    // コミット
+                    $connection->commit();
+
+                    return $this->redirect(['controller' => 'Users', 'action' => 'send_reissue_password_mail_complete']);
+                } else if (empty($user) && $user_entity->hasErrors()) {
+                    $this->Flash->error(__('送信ができませんでした。'));
+                } else if (empty($user) && !$user_entity->hasErrors()) {
+                    $this->Flash->error(__('登録されていないメールアドレスです。'));
+                }
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('送信ができませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
         }
 
