@@ -349,7 +349,7 @@ class UsersController extends AppController
                 ])->toArray();
 
                 // ユーザーデータを削除
-                $this->Users->delete($user);
+                $this->Users->deleteOrFail($user);
 
                 // プロフィール画像を削除
                 unlink(UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');

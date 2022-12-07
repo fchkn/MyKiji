@@ -4,7 +4,6 @@
  * @var iterable<\App\Model\Entity\User> $users
  */
 ?>
-<?= $this->Flash->render() ?>
 <form method="post" name="withdraw_form">
 <div class="container-fluid">
     <div class="row py-5 justify-content-center">
