@@ -264,6 +264,9 @@ class UsersController extends AppController
                 $session = $this->getRequest()->getSession();
                 $session->write('redirect', 'users_edit');
 
+                // コミット
+                $connection->commit();
+
                 // ページを更新
                 return $this->redirect($this->request->referer());
             } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
