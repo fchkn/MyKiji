@@ -316,18 +316,19 @@ class UsersController extends AppController
     public function delete()
     {
         if ($this->request->is('post')) {
-            $user = $this->Users->get($this->auth_user->id);
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            $articles = $this->Articles->find('all', [
-                'conditions' => ['user_id' => $this->auth_user->id]
-            ])->toArray();
+            try {
+                $user = $this->Users->get($this->auth_user->id);
 
-            // ユーザーデータを削除
-            if ($this->Users->delete($user)) {
-                // ログアウト処理を実行
-                if ($this->Authentication->getResult()->isValid()) {
-                    $this->Authentication->logout();
-                }
+                $articles = $this->Articles->find('all', [
+                    'conditions' => ['user_id' => $this->auth_user->id]
+                ])->toArray();
+
+                // ユーザーデータを削除
+                $this->Users->delete($user);
 
                 // プロフィール画像を削除
                 unlink(UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
@@ -341,12 +342,42 @@ class UsersController extends AppController
                     }
                 }
 
+                // ログアウト処理を実行
+                if ($this->Authentication->getResult()->isValid()) {
+                    $this->Authentication->logout();
+                }
+
                 // 退会完了メールを送信
                 $this->getMailer('User')->send('withdrawal', [$user]);
 
+                // コミット
+                $connection->commit();
+
                 return $this->redirect(['controller' => 'Users', 'action' => 'delete_complete']);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('退会ができませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
-            $this->Flash->error(__('退会ができませんでした。'));
         }
     }
 
