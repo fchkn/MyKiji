@@ -339,9 +339,9 @@ class ArticlesController extends AppController
 
                 $this->Flash->error(__('異常なエラーが発生しました。'));
             }
-
-            $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
         }
+
+        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
     }
 
     /**
@@ -351,10 +351,16 @@ class ArticlesController extends AppController
         $article_id = $this->request->getQuery('article_id');
 
         if ($this->request->is('post')) {
-            $article = $this->Articles->get($article_id);
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            // 記事データを削除
-            if ($this->Articles->delete($article)) {
+            try {
+                $article = $this->Articles->get($article_id);
+
+                // 記事データを削除
+                $this->Articles->deleteOrFail($article);
+
                 // 記事画像を削除
                 $this->deleteImage($article_id);
 
@@ -362,10 +368,36 @@ class ArticlesController extends AppController
                 $session = $this->getRequest()->getSession();
                 $session->write('redirect', 'articles_delete');
 
+                // コミット
+                $connection->commit();
+
                 return $this->redirect(['controller' => 'Users', 'action' => 'view?user_id='. $this->auth_user->id]);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('記事を削除できませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
         }
-        $this->Flash->error(__('記事を削除できませんでした。'));
+
         $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
     }
 
