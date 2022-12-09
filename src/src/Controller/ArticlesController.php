@@ -175,7 +175,7 @@ class ArticlesController extends AppController
 
             try {
                 $data = array_merge(['user_id' => $this->auth_user->id], $this->request->getData());
-    
+
                 $dom = new DOMDocument;
                 $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
                 $imgs = $dom->getElementsByTagName('img');
@@ -251,54 +251,97 @@ class ArticlesController extends AppController
         $data = $this->request->getData();
 
         if ($this->request->is('post')) {
-            $article = $this->Articles->get($article_id);
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            $dom = new DOMDocument;
-            $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
-            $imgs = $dom->getElementsByTagName('img');
+            try {
+                $article = $this->Articles->get($article_id);
 
-            if ($imgs->length != 0) {
-                // imgタグが記事本文にある場合
-                // 記事データを更新
-                $this->Articles->patchEntity($article, [
-                    'title' => $data['title'],
-                    'text' => $this->createImageAndEmendText($dom, $article_id, 'edit'),
-                    'tag_1' => $data['tag_1'],
-                    'tag_2' => $data['tag_2'],
-                    'tag_3' => $data['tag_3'],
-                    'tag_4' => $data['tag_4'],
-                    'tag_5' => $data['tag_5'],
-                    'tag_6' => $data['tag_6'],
+                $dom = new DOMDocument;
+                $dom->loadHTML(mb_convert_encoding($data['text'], 'HTML-ENTITIES', 'UTF-8'));
+                $imgs = $dom->getElementsByTagName('img');
+
+                if ($imgs->length != 0) {
+                    // imgタグが記事本文にある場合
+                    // 記事データを更新
+                    $this->Articles->patchEntity($article, [
+                        'title' => $data['title'],
+                        'text' => $this->createImageAndEmendText($dom, $article_id, 'edit'),
+                        'tag_1' => $data['tag_1'],
+                        'tag_2' => $data['tag_2'],
+                        'tag_3' => $data['tag_3'],
+                        'tag_4' => $data['tag_4'],
+                        'tag_5' => $data['tag_5'],
+                        'tag_6' => $data['tag_6'],
+                    ]);
+                    $this->Articles->saveOrFail($article);
+
+                    // 記事画像バックアップを削除する
+                    $this->deleteImageBackup($article->id);
+                } else {
+                    // imgタグが記事本文にない場合
+                    // 記事データを更新
+                    $this->Articles->patchEntity($article, [
+                        'title' => $data['title'],
+                        'text' => $data['text'],
+                        'tag_1' => $data['tag_1'],
+                        'tag_2' => $data['tag_2'],
+                        'tag_3' => $data['tag_3'],
+                        'tag_4' => $data['tag_4'],
+                        'tag_5' => $data['tag_5'],
+                        'tag_6' => $data['tag_6'],
+                    ]);
+                    $this->Articles->saveOrFail($article);
+
+                    // 既存記事画像を削除
+                    $this->deleteImage($article->id);
+                }
+
+                // 記事編集完了ポップアップの判定パラメータをセッションに格納
+                $session = $this->getRequest()->getSession();
+                $session->write('redirect', 'articles_edit');
+
+                // コミット
+                $connection->commit();
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // 記事画像をバックアップから復元
+                $this->restoreImageBackup($article_id);
+
+                $this->Flash->error(__('退会ができませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                if ($e->getMessage() == "記事画像のバックアップ作成に失敗しました。") {
+                    // 記事画像バックアップフォルダを削除する
+                    $this->deleteImageBackup($article_id);
+                } else {
+                    // 記事画像をバックアップから復元する
+                    $this->restoreImageBackup($article_id);
+                }
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
                 ]);
-                $this->Articles->save($article);
+                $this->log($error);
 
-                // 記事画像バックアップを削除する
-                $this->deleteImageBackup($article->id);
-            } else {
-                // imgタグが記事本文にない場合
-                // 記事データを更新
-                $this->Articles->patchEntity($article, [
-                    'title' => $data['title'],
-                    'text' => $data['text'],
-                    'tag_1' => $data['tag_1'],
-                    'tag_2' => $data['tag_2'],
-                    'tag_3' => $data['tag_3'],
-                    'tag_4' => $data['tag_4'],
-                    'tag_5' => $data['tag_5'],
-                    'tag_6' => $data['tag_6'],
-                ]);
-                $this->Articles->save($article);
-
-                // 既存記事画像を削除
-                $this->deleteImage($article->id);
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
+
+            $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
         }
-
-        // 記事削除完了ポップアップの判定パラメータをセッションに格納
-        $session = $this->getRequest()->getSession();
-        $session->write('redirect', 'articles_edit');
-
-        $this->redirect(['controller' => 'Articles', 'action' => 'view?article_id='. $article_id]);
     }
 
     /**
@@ -440,6 +483,34 @@ class ArticlesController extends AppController
     private function deleteImageBackup($article_id) {
         $img_dir_path_backup = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id ."_backup";
         if (file_exists($img_dir_path_backup)) {
+            array_map('unlink', glob($img_dir_path_backup. '/*.*'));
+            rmdir($img_dir_path_backup);
+        }
+    }
+
+    /**
+     * 記事画像バックアップ復元処理
+     *
+     * @param int article_id
+     */
+    private function restoreImageBackup($article_id) {
+        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+        $img_dir_path_backup = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id ."_backup";
+        if (file_exists($img_dir_path) && file_exists($img_dir_path_backup)) {
+            // 記事画像フォルダの中身を削除する
+            array_map('unlink', glob($img_dir_path. '/*.*'));
+
+            // バックアップフォルダの中身を記事画像フォルダにコピーする
+            if ($handle = opendir($img_dir_path_backup)) {
+                while(false !== ($file = readdir($handle))) {
+                    if ($file != "." && $file != "..") {
+                        copy($img_dir_path_backup . '/' . $file, $img_dir_path . '/' . $file);
+                    }
+                }
+                closedir($handle);
+            }
+
+            // バックアップフォルダを削除する
             array_map('unlink', glob($img_dir_path_backup. '/*.*'));
             rmdir($img_dir_path_backup);
         }
