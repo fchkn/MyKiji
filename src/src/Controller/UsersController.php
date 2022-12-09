@@ -628,7 +628,6 @@ class UsersController extends AppController
         // 元画像のバックアップを作成
         $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
         $profile_img_backup_path = UPLOAD_PROFILE_IMG_PATH . 'user_' . $user_id .  '_backup.jpg';
-        copy($profile_img_path, $profile_img_backup_path);
         if(!copy($profile_img_path, $profile_img_backup_path)){
             throw new \Exception('プロフィール画像のバックアップ作成に失敗しました。', 500);
         }
