@@ -42,56 +42,74 @@ class ArticlesController extends AppController
     public function view() {
         $article_id = $this->request->getQuery('article_id');
         $article = null;
-
-        // 記事データ取得
-        if (!empty($article_id) && is_numeric($article_id)) {
-            $article = $this->Articles->findById($article_id)->first();
-
-            if (is_null($article)) {
-                // 存在しない記事の場合はトップ画面に遷移させる
-                return $this->redirect(['controller' => 'Top', 'action' => 'index']);
-            }
-        } else {
-            // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
-            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
-        }
-
-        // ユーザーデータ取得
-        $user = $this->Users->findById($article->user_id)->first();
-
+        $user = null;
         $hasFavorite = false;
         $hasFollow = false;
-        if ($this->hasAuth) {
-            // お気に入り登録の有無を確認
-            $favorite = $this->Favorites->find()->where([
-                'user_id' => $this->auth_user->id,
-                'article_id' => $article_id])->first();
-            if(!empty($favorite)) {
-                $hasFavorite = true;
-            }
-            // フォローの有無を確認
-            $follow = $this->Follows->find()->where([
-                'user_id' => $this->auth_user->id,
-                'follow_user_id' => $user->id])->first();
-            if(!empty($follow)) {
-                $hasFollow = true;
-            }
-        }
+        $existing_imgs_size_csv = "";
+        $hasError = false;
 
-        // 既存記事画像のファイルサイズを取得
-        $existing_imgs_size = [];
-        $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
-        if (file_exists($img_dir_path)) {
-            if ($handle = opendir($img_dir_path)) {
-                while(false !== ($file = readdir($handle))) {
-                    if ($file != "." && $file != "..") {
-                        $existing_imgs_size[] += filesize($img_dir_path . '/' . $file);
-                    }
+        try {
+            // 記事データ取得
+            if (!empty($article_id) && is_numeric($article_id)) {
+                $article = $this->Articles->findById($article_id)->first();
+
+                if (is_null($article)) {
+                    // 存在しない記事の場合はトップ画面に遷移させる
+                    return $this->redirect(['controller' => 'Top', 'action' => 'index']);
                 }
-                closedir($handle);
+            } else {
+                // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
+                return $this->redirect(['controller' => 'Top', 'action' => 'index']);
             }
+
+            // ユーザーデータ取得
+            $user = $this->Users->findById($article->user_id)->first();
+
+            if ($this->hasAuth) {
+                // お気に入り登録の有無を確認
+                $favorite = $this->Favorites->find()->where([
+                    'user_id' => $this->auth_user->id,
+                    'article_id' => $article_id])->first();
+                if(!empty($favorite)) {
+                    $hasFavorite = true;
+                }
+                // フォローの有無を確認
+                $follow = $this->Follows->find()->where([
+                    'user_id' => $this->auth_user->id,
+                    'follow_user_id' => $user->id])->first();
+                if(!empty($follow)) {
+                    $hasFollow = true;
+                }
+            }
+
+            // 既存記事画像のファイルサイズを取得
+            $existing_imgs_size = [];
+            $img_dir_path = UPLOAD_ARTICLE_IMG_PATH . "article_" . $article_id;
+            if (file_exists($img_dir_path)) {
+                if ($handle = opendir($img_dir_path)) {
+                    while(false !== ($file = readdir($handle))) {
+                        if ($file != "." && $file != "..") {
+                            $existing_imgs_size[] += filesize($img_dir_path . '/' . $file);
+                        }
+                    }
+                    closedir($handle);
+                }
+            }
+            $existing_imgs_size_csv = !empty($existing_imgs_size) ? implode(",", $existing_imgs_size) : "";
+        } catch (\Exception $e) {
+            $hasError = true;
+
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+
+            $this->Flash->error(__('異常なエラーが発生しました。'));
         }
-        $existing_imgs_size_csv = !empty($existing_imgs_size) ? implode(",", $existing_imgs_size) : "";
 
         // リダイレクトプロパティ取得
         $session = $this->getRequest()->getSession();
@@ -100,7 +118,15 @@ class ArticlesController extends AppController
             $session->delete('redirect');
         }
 
-        $this->set(compact('article', 'user', 'hasFavorite', 'hasFollow', 'existing_imgs_size_csv', 'redirect'));
+        $this->set(compact(
+            'article',
+            'user',
+            'hasFavorite',
+            'hasFollow',
+            'existing_imgs_size_csv',
+            'redirect',
+            'hasError',
+        ));
     }
 
     /**
