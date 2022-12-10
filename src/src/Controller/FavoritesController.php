@@ -67,18 +67,46 @@ class FavoritesController extends AppController
      */
     public function delete()
     {
-        $article_id = $this->request->getQuery('article_id');
-        $favorite_id = $this->Favorites->find()->where([
-            'user_id' => $this->auth_user->id,
-            'article_id' => $article_id
-        ])->first()->id;
+        // トランザクション開始
+        $connection = ConnectionManager::get('default');
+        $connection->begin();
 
-        $favorite = $this->Favorites->get($favorite_id);
+        try {
+            $article_id = $this->request->getQuery('article_id');
+            $favorite_id = $this->Favorites->find()->where([
+                'user_id' => $this->auth_user->id,
+                'article_id' => $article_id
+            ])->first()->id;
+            $favorite = $this->Favorites->get($favorite_id);
 
-        if ($this->Favorites->delete($favorite)) {
-            return $this->redirect($this->referer());
+            $this->Favorites->deleteOrFail($favorite);
+
+            // コミット
+            $connection->commit();
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            // バリデーション違反時の例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            $this->Flash->error(__('お気に入りから外せませんでした'));
+        } catch (\Exception $e) {
+            // その他例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+
+            $this->Flash->error(__('異常なエラーが発生しました。'));
         }
-        $this->Flash->error(__('The favorite could not be deleted. Please, try again.'));
 
         return $this->redirect($this->referer());
     }
