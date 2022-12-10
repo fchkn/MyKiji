@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Datasource\ConnectionManager;
 use Cake\Mailer\MailerAwareTrait;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -51,71 +52,82 @@ class UsersController extends AppController
     public function view() {
         $user_id = $this->request->getQuery('user_id');
         $user = null;
+        $post_articles = null;
+        $favorites = null;
+        $follows = null;
+        $followers = null;
+        $hasFollow = false;
+        $hasPaginator = true;
 
-        // ユーザーデータ取得
-        if (!empty($user_id) && is_numeric($user_id)) {
-            $user = $this->Users->findById($user_id)->first();
+        try {
+            // ユーザーデータ取得
+            if (!empty($user_id) && is_numeric($user_id)) {
+                $user = $this->Users->findById($user_id)->first();
 
-            if (is_null($user)) {
-                // 存在しないユーザーの場合はトップ画面に遷移させる
+                if (is_null($user)) {
+                    // 存在しないユーザーの場合はトップ画面に遷移させる
+                    return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+                }
+            } else {
+                // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
                 return $this->redirect(['controller' => 'Top', 'action' => 'index']);
             }
-        } else {
-            // クエリパラメータが存在しない、または数値以外の場合はトップ画面に遷移させる
-            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
-        }
 
-        // 投稿記事データ取得
-        $post_articles = $this->paginate($this->Articles->find('all', [
-            'conditions' => ['articles.user_id' => $user_id],
-            'contain' => ['Users'],
-            'order' => ['articles.created' => 'desc'],
-        ]), ['limit' => 5, 'scope' => 'articles'])->toArray();
-        $this->set(compact('post_articles'));
+            // 投稿記事データ取得
+            $post_articles = $this->paginate($this->Articles->find('all', [
+                'conditions' => ['articles.user_id' => $user_id],
+                'contain' => ['Users'],
+                'order' => ['articles.created' => 'desc'],
+            ]), ['limit' => 5, 'scope' => 'articles'])->toArray();
 
-        // お気に入りデータ取得
-        $favorites = $this->paginate($this->Favorites->find('all', [
-            'conditions' => ['favorites.user_id' => $user_id],
-            'contain' => ['Articles.Users'],
-            'order' => ['favorites.created' => 'desc'],
-        ]), ['limit' => 5,'scope' => 'favorites'])->toArray();
-        $this->set(compact('favorites'));
+            // お気に入りデータ取得
+            $favorites = $this->paginate($this->Favorites->find('all', [
+                'conditions' => ['favorites.user_id' => $user_id],
+                'contain' => ['Articles.Users'],
+                'order' => ['favorites.created' => 'desc'],
+            ]), ['limit' => 5,'scope' => 'favorites'])->toArray();
 
-        // Followsのエイリアス名を一時退避
-        $tmpAlias = $this->Follows->getAlias();
+            // Followsのエイリアス名を一時退避
+            $tmpAlias = $this->Follows->getAlias();
 
-        // フォローデータ取得
-        $follows = $this->paginate($this->Follows->setAlias('follows')->find('all', [
-            'conditions' => ['follows.user_id' => $user_id],
-            'contain' => ['FollowUsers'],
-            'order' => ['follows.created' => 'desc'],
-        ]), ['limit' => 10, 'scope' => 'follows'])->toArray();
-        $this->set(compact('follows'));
+            // フォローデータ取得
+            $follows = $this->paginate($this->Follows->setAlias('follows')->find('all', [
+                'conditions' => ['follows.user_id' => $user_id],
+                'contain' => ['FollowUsers'],
+                'order' => ['follows.created' => 'desc'],
+            ]), ['limit' => 10, 'scope' => 'follows'])->toArray();
 
-        // フォロワーデータ取得
-        $followers = $this->paginate($this->Follows->setAlias('followers')->find('all', [
-            'conditions' => ['followers.follow_user_id' => $user_id],
-            'contain' => ['FollowerUsers'],
-            'order' => ['followers.created' => 'desc'],
-        ]), ['limit' => 10, 'scope' => 'followers'])->toArray();
-        $this->set(compact('followers'));
+            // フォロワーデータ取得
+            $followers = $this->paginate($this->Follows->setAlias('followers')->find('all', [
+                'conditions' => ['followers.follow_user_id' => $user_id],
+                'contain' => ['FollowerUsers'],
+                'order' => ['followers.created' => 'desc'],
+            ]), ['limit' => 10, 'scope' => 'followers'])->toArray();
 
-        // Followsのエイリアス名を元に戻す
-        $this->Follows->setAlias($tmpAlias);
+            // Followsのエイリアス名を元に戻す
+            $this->Follows->setAlias($tmpAlias);
 
-        // ログインユーザーがフォロー中か確認
-        $hasFollow = false;
-        if ($this->hasAuth) {
-            $follow = $this->Follows->find()->where([
-                'user_id' => $this->auth_user->id,
-                'follow_user_id' => $user_id])->first();
-            if(!empty($follow)) {
-                $hasFollow = true;
+            // ログインユーザーがフォロー中か確認
+            if ($this->hasAuth) {
+                $follow = $this->Follows->find()->where([
+                    'user_id' => $this->auth_user->id,
+                    'follow_user_id' => $user_id])->first();
+                if(!empty($follow)) {
+                    $hasFollow = true;
+                }
             }
-        }
+        } catch (\Exception $e) {
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
 
-        // ページネーション要否
-        $hasPaginator = true;
+            $this->Flash->error(__('異常なエラーが発生しました。'));
+        }
 
         // マイページ判定
         $isMypage = false;
@@ -130,7 +142,17 @@ class UsersController extends AppController
             $session->delete('redirect');
         }
 
-        $this->set(compact('user', 'post_articles', 'hasFollow', 'hasPaginator', 'isMypage', 'redirect'));
+        $this->set(compact(
+            'user',
+            'post_articles',
+            'favorites',
+            'follows',
+            'followers',
+            'hasFollow',
+            'hasPaginator',
+            'isMypage',
+            'redirect'
+        ));
     }
 
     /**
@@ -139,26 +161,67 @@ class UsersController extends AppController
     public function add()
     {
         $user = $this->Users->newEmptyEntity();
+
         if ($this->request->is('post')) {
-            $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
+
+            try {
+                // ユーザデータを登録
+                $this->Users->patchEntity($user, $this->request->getData());
+                $this->Users->saveOrFail($user);
+
                 // トークンテーブルを登録
                 $token = $this->Tokens->newEmptyEntity();
                 $this->Tokens->patchEntity($token, ['user_id' => $user->id]);
-                $this->Tokens->save($token);
-
-                // 認証設定してログイン状態にする
-                $this->Authentication->setIdentity($user);
+                $this->Tokens->saveOrFail($token);
 
                 // プロフィール画像にデフォルトアイコンを設定
-                copy(WWW_ROOT . 'img/default_icon.jpg', UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
+                if(!copy(WWW_ROOT . 'img/default_icon.jpg', UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg')){
+                    throw new \Exception('プロフィール画像の作成に失敗しました。', 500);
+                }
 
                 // 登録完了メールを送信
                 $this->getMailer('User')->send('register', [$user]);
 
+                // 認証設定してログイン状態にする
+                $this->Authentication->setIdentity($user);
+
+                // コミット
+                $connection->commit();
+
                 return $this->redirect(['controller' => 'Users', 'action' => 'add_complete']);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('登録ができませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // プロフィール画像削除
+                $img_path = UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg';
+                if (file_exists($img_path)) {
+                    unlink($img_path);
+                }
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
-            $this->Flash->error(__('登録ができませんでした。'));
         }
         $this->set(compact('user'));
     }
@@ -178,47 +241,78 @@ class UsersController extends AppController
         $user = $this->Users->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $user = $this->Users->get($this->auth_user->id);
-            $data = $this->request->getData();
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            switch ($data['edit_target']) {
-                case 'profileinfo' :
-                    // ユーザー名変更
-                    $this->Users->patchEntity($user, ['name' => $data['name']]);
-                    break;
-                case 'email' :
-                    // メールアドレス変更
-                    $this->Users->patchEntity($user, ['email' => $data['email']]);
-                    break;
-                case 'password' :
-                    // パスワード変更
-                    $this->Users->patchEntity($user, [
-                        'password' => $data['password'],
-                        'password_re' => $data['password_re'],
-                        'password_curt' => $data['password_curt'],
-                        'password_curt_registered' => $this->auth_user->password
-                    ]);
-                    break;
-            }
+            try {
+                $user = $this->Users->get($this->auth_user->id);
+                $data = $this->request->getData();
 
-            // テーブルを更新
-            if ($this->Users->save($user)) {
+                switch ($data['edit_target']) {
+                    case 'profileinfo' :
+                        // ユーザー名変更
+                        $this->Users->patchEntity($user, ['name' => $data['name']]);
+                        break;
+                    case 'email' :
+                        // メールアドレス変更
+                        $this->Users->patchEntity($user, ['email' => $data['email']]);
+                        break;
+                    case 'password' :
+                        // パスワード変更
+                        $this->Users->patchEntity($user, [
+                            'password' => $data['password'],
+                            'password_re' => $data['password_re'],
+                            'password_curt' => $data['password_curt'],
+                            'password_curt_registered' => $this->auth_user->password
+                        ]);
+                        break;
+                }
+
+                // ユーザーデータを更新
+                $this->Users->saveOrFail($user);
+
                 // プロフィール画像を変更
                 if ($data['edit_target'] == "profileinfo" &&
                     !empty($data['profile_img']->getClientFilename())) {
                     $this->saveProfileImg($data['profile_img'], $user->id);
                 }
-                // 認証を再設定
+
+                // ログイン認証を再設定
                 $this->Authentication->setIdentity($user);
 
                 // 変更保存完了ポップアップの判定パラメータをセッションに格納
                 $session = $this->getRequest()->getSession();
                 $session->write('redirect', 'users_edit');
 
+                // コミット
+                $connection->commit();
+
                 // ページを更新
                 return $this->redirect($this->request->referer());
-            } else {
-                $this->Flash->error(__('変更を保存できませんでした。'));
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('変更ができませんでした。'));
+            }  catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
         } else {
             $this->Users->patchEntity($user, [
@@ -243,18 +337,19 @@ class UsersController extends AppController
     public function delete()
     {
         if ($this->request->is('post')) {
-            $user = $this->Users->get($this->auth_user->id);
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            $articles = $this->Articles->find('all', [
-                'conditions' => ['user_id' => $this->auth_user->id]
-            ])->toArray();
+            try {
+                $user = $this->Users->get($this->auth_user->id);
 
-            // ユーザーデータを削除
-            if ($this->Users->delete($user)) {
-                // ログアウト処理を実行
-                if ($this->Authentication->getResult()->isValid()) {
-                    $this->Authentication->logout();
-                }
+                $articles = $this->Articles->find('all', [
+                    'conditions' => ['user_id' => $this->auth_user->id]
+                ])->toArray();
+
+                // ユーザーデータを削除
+                $this->Users->deleteOrFail($user);
 
                 // プロフィール画像を削除
                 unlink(UPLOAD_PROFILE_IMG_PATH . 'user_' . $user->id .  '.jpg');
@@ -268,12 +363,42 @@ class UsersController extends AppController
                     }
                 }
 
+                // ログアウト処理を実行
+                if ($this->Authentication->getResult()->isValid()) {
+                    $this->Authentication->logout();
+                }
+
                 // 退会完了メールを送信
                 $this->getMailer('User')->send('withdrawal', [$user]);
 
+                // コミット
+                $connection->commit();
+
                 return $this->redirect(['controller' => 'Users', 'action' => 'delete_complete']);
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('退会ができませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
-            $this->Flash->error(__('退会ができませんでした。'));
         }
     }
 
@@ -328,35 +453,69 @@ class UsersController extends AppController
         $user_entity = $this->Users->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $email = $this->request->getData('email');
-            $this->Users->patchEntity($user_entity, ['email' => $email]);
+            // トランザクション開始
+            $connection = ConnectionManager::get('default');
+            $connection->begin();
 
-            $user = $this->Users->find('all', [
-                'conditions' => ['email' => $email],
-            ])->first();
+            try {
+                $email = $this->request->getData('email');
+                $this->Users->patchEntity($user_entity, ['email' => $email]);
 
-            if (!empty($user)) {
-                // トークンと有効期限(30分)を生成
-                $tmp_token = substr(str_shuffle('1234567890abcdefghijklmnopqrstuvwxyz'), 0, 16);
-                $limit_time = time() + 1800;
+                $user = $this->Users->find('all', [
+                    'conditions' => ['email' => $email],
+                ])->first();
 
-                // トークンテーブルに設定
-                $token_id = $this->Tokens->find('all', [
-                    'conditions' => ['user_id' => $user->id],
-                ])->first()->id;
-                $token = $this->Tokens->get($token_id);
-                $this->Tokens->patchEntity($token, ['token' => $tmp_token, 'limit_time' => $limit_time]);
-                $this->Tokens->save($token);
+                if (!empty($user)) {
+                    // トークンと有効期限(30分)を生成
+                    $tmp_token = substr(str_shuffle('1234567890abcdefghijklmnopqrstuvwxyz'), 0, 16);
+                    $limit_time = time() + 1800;
 
-                // パスワード再発行画面のurlを設定
-                $url = Router::url('/users/reissue_password?ui='. $user->id . '&tk=' . $tmp_token, true);
+                    // トークンテーブルに設定
+                    $token_id = $this->Tokens->find('all', [
+                        'conditions' => ['user_id' => $user->id],
+                    ])->first()->id;
+                    $token = $this->Tokens->get($token_id);
+                    $this->Tokens->patchEntity($token, ['token' => $tmp_token, 'limit_time' => $limit_time]);
+                    $this->Tokens->saveOrFail($token);
 
-                // パスワード再発行メールを送信
-                $this->getMailer('User')->send('reissue_password', [$user, $url]);
+                    // パスワード再発行画面のurlを設定
+                    $url = Router::url('/users/reissue_password?ui='. $user->id . '&tk=' . $tmp_token, true);
 
-                return $this->redirect(['controller' => 'Users', 'action' => 'send_reissue_password_mail_complete']);
-            } else {
-                $this->Flash->error(__('登録されていないメールアドレスです。'));
+                    // パスワード再発行メールを送信
+                    $this->getMailer('User')->send('reissue_password', [$user, $url]);
+
+                    // コミット
+                    $connection->commit();
+
+                    return $this->redirect(['controller' => 'Users', 'action' => 'send_reissue_password_mail_complete']);
+                } else if (empty($user) && $user_entity->hasErrors()) {
+                    $this->Flash->error(__('送信ができませんでした。'));
+                } else if (empty($user) && !$user_entity->hasErrors()) {
+                    $this->Flash->error(__('登録されていないメールアドレスです。'));
+                }
+            } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+                // バリデーション違反時の例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                $this->Flash->error(__('送信ができませんでした。'));
+            } catch (\Exception $e) {
+                // その他例外処理
+
+                // ロールバック
+                $connection->rollback();
+
+                // エラーログを出力
+                $error = implode("\n", [
+                    "\nStatus Code: " . $e->getCode(),
+                    "Message: " . $e->getMessage(),
+                    "File: " . $e->getFile() . ", line " . $e->getLine(),
+                    "Stack Trace:\n" . $e->getTraceAsString()
+                ]);
+                $this->log($error);
+
+                $this->Flash->error(__('異常なエラーが発生しました。'));
             }
         }
 
@@ -376,40 +535,74 @@ class UsersController extends AppController
     public function reissue_password()
     {
         $params = $this->request->getQueryParams();
+        $user = null;
         $isEnableAccess = false;
 
-        // ユーザーデータ取得
-        $user = $this->Users->get($params['ui']);
+        // トランザクション開始
+        $connection = ConnectionManager::get('default');
+        $connection->begin();
 
-        // トークンデータ取得
-        $token_id = $this->Tokens->find('all', [
-            'conditions' => ['user_id' => $user->id],
-        ])->first()->id;
-        $token = $this->Tokens->get($token_id);
+        try {
+            // ユーザーデータ取得
+            $user = $this->Users->get($params['ui']);
 
-        // 有効なアクセスであることを判定
-        if (!empty($user) && !empty($token) && $token->token == $params['tk'] && time() < $token->limit_time) {
-            $isEnableAccess = true;
+            // トークンデータ取得
+            $token_id = $this->Tokens->find('all', [
+                'conditions' => ['user_id' => $user->id],
+            ])->first()->id;
+            $token = $this->Tokens->get($token_id);
 
-            if ($this->request->is('post')) {
-                $data = $this->request->getData();
-                // パスワードを更新
-                $this->Users->patchEntity($user, [
-                    'password' => $data['password'],
-                    'password_re' => $data['password_re']]);
-                if ($this->Users->save($user)) {
+            // 有効なアクセスであることを判定
+            if (!empty($user) && !empty($token) && $token->token == $params['tk'] && time() < $token->limit_time) {
+                $isEnableAccess = true;
+
+                if ($this->request->is('post')) {
+                    $data = $this->request->getData();
+
+                    // パスワードを更新
+                    $this->Users->patchEntity($user, [
+                        'password' => $data['password'],
+                        'password_re' => $data['password_re']]);
+                    $this->Users->saveOrFail($user);
+
                     // トークンテーブルを初期化
                     $this->Tokens->patchEntity($token, ['token' => null, 'limit_time' => null]);
-                    $this->Tokens->save($token);
+                    $this->Tokens->saveOrFail($token);
+
+                    // コミット
+                    $connection->commit();
 
                     return $this->redirect(['controller' => 'Users', 'action' => 'reissue_password_complete']);
                 } else {
-                    $this->Flash->error(__('再発行ができませんでした。'));
+                    $user = $this->Users->newEmptyEntity();
                 }
-            } else {
-                $user = $this->Users->newEmptyEntity();
             }
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            // バリデーション違反時の例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            $this->Flash->error(__('再発行ができませんでした。'));
+        } catch (\Exception $e) {
+            // その他例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+
+            $this->Flash->error(__('異常なエラーが発生しました。'));
         }
+
+
 
         $this->set(compact('user', 'isEnableAccess'));
     }
@@ -431,6 +624,13 @@ class UsersController extends AppController
     {
         $file = $profile_img->getStream()->getMetadata('uri');
         $type = $profile_img->getClientMediaType();
+
+        // 元画像のバックアップを作成
+        $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
+        $profile_img_backup_path = UPLOAD_PROFILE_IMG_PATH . 'user_' . $user_id .  '_backup.jpg';
+        if(!copy($profile_img_path, $profile_img_backup_path)){
+            throw new \Exception('プロフィール画像のバックアップ作成に失敗しました。', 500);
+        }
 
         // 元画像のファイルデータを作成
         $src_img = null;
@@ -463,9 +663,20 @@ class UsersController extends AppController
         // 新規画像にプロフィール画像を貼付け
         imagecopyresampled($dst_img, $src_img, 0, 0, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
 
-        // 成型したプロフィール画像を保存
-        $profile_img_path = UPLOAD_PROFILE_IMG_PATH . 'user_'. $user_id . '.jpg';
-        imagejpeg($dst_img, $profile_img_path);
+        // プロフィール画像を保存
+        if(imagejpeg($dst_img, $profile_img_path)) {
+            // バックアップを削除
+            unlink($profile_img_backup_path);
+        } else {
+            // バックアップを元画像にコピー
+            !copy($profile_img_backup_path, $profile_img_path);
+            // バックアップを削除
+            unlink($profile_img_backup_path);
+            // リソースを解放
+            imagedestroy($src_img);
+            imagedestroy($dst_img);
+            throw new \Exception('プロフィール画像変更に失敗しました。', 500);
+        }
 
         // リソースを解放
         imagedestroy($src_img);

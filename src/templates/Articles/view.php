@@ -9,7 +9,7 @@
 <form method="post" name="articles_view_form" style="height: 100%">
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
 <div class="container-fluid">
-    <?php if ($hasAuth && $auth_user->id == $article->user_id): ?>
+    <?php if ($hasAuth && !$hasError && $auth_user->id == $article->user_id): ?>
         <div class="row py-3 border-bottom">
             <!-- 記事編集ボタン -->
             <div class="col-4 d-flex align-self-center justify-content-end">
@@ -38,17 +38,31 @@
     <div class="row pt-5 align-items-center">
         <!-- プロフィール画像 -->
         <div class="col-1">
-            <button type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
-                <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img">
-            </button>
+            <?php if(!empty($user)): ?>
+                <button type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
+                    <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img">
+                </button>
+            <?php else: ?>
+                <button type='button'>
+                    <img class="img-thumbnail mr-1 userimg-article" src="/img/default_icon.jpg" alt="profile_img">
+                </button>
+            <?php endif; ?>
         </div>
         <!-- ユーザー名・投稿日・更新日 -->
         <div class="col-9">
-            <p class="m-0 text-secondary"><?php echo $user->name ?></p>
-            <p class="m-0 text-secondary">投稿日: <?php echo date('Y/m/d G:i',  strtotime($article->created)) ?>&emsp;更新日: <?php echo date('Y/m/d G:i',  strtotime($article->modified)) ?></p>
+            <?php if(!empty($user)): ?>
+                <p class="m-0 text-secondary"><?php echo $user->name ?></p>
+            <?php else: ?>
+                <p class="m-0 text-secondary">不明なユーザー</p>
+            <?php endif; ?>
+            <?php if(!empty($article)): ?>
+                <p class="m-0 text-secondary">投稿日: <?php echo date('Y/m/d G:i',  strtotime($article->created)) ?>&emsp;更新日: <?php echo date('Y/m/d G:i',  strtotime($article->modified)) ?></p>
+            <?php else: ?>
+                <p class="m-0 text-secondary">投稿日: &emsp;更新日: </p>
+            <?php endif; ?>
         </div>
         <!-- お気に入りボタン・フォローボタン -->
-        <?php if (!$hasAuth): ?>
+        <?php if (!$hasAuth && !$hasError): ?>
             <div class ="col-1 text-right">
                 <abbr title="お気に入りに追加する場合はログインが必要です">
                     <button type="button">
@@ -63,7 +77,7 @@
                     </button>
                 </abbr>
             </div>
-        <?php else: ?>
+        <?php elseif ($hasAuth && !$hasError): ?>
             <?php if ($user->id != $auth_user->id): ?>
                 <?php if ($hasFavorite): ?>
                     <div class ="col-1 text-right">
@@ -106,32 +120,40 @@
     <!-- 記事タイトル -->
     <div class="row py-3">
         <div class="col-12">
-            <input type="text" id="title" name="title" value="<?php echo $article->title ?>" style="display:none"></input>
-            <h1 class="m-0" id ='title_view'><?php echo $article->title ?></h1>
+            <?php if(!empty($article)): ?>
+                <input type="text" id="title" name="title" value="<?php echo $article->title ?>" style="display:none"></input>
+                <h1 class="m-0" id ='title_view'><?php echo $article->title ?></h1>
+            <?php else: ?>
+                <h1 class="m-0" id ='title_view'>不明な記事</h1>
+            <?php endif; ?>
         </div>
     </div>
 
     <!-- 記事タグ -->
     <div class="row pb-5">
         <div class="col-12">
-            <?php for ($i = 1; $i <= 6; $i++) : ?>
-                <span class="pr-1">
-                    <input type="text" id="tag_<?php echo $i ?>" name="tag_<?php echo $i ?>" value="<?php echo $article->{"tag_" . $i} ?>" style="display:none">
-                    <?php if (!empty($article->{"tag_" . $i})): ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_<?php echo $i ?>_view" onclick="location.href='/articles/search?tag=<?php echo $article->{'tag_' . $i} ?>'"><?php echo $article->{"tag_" . $i} ?></button>
-                    <?php else: ?>
-                        <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_<?php echo $i ?>_view" style="display:none"></button>
-                    <?php endif; ?>
-                </span>
-            <? endfor; ?>
+            <?php if(!empty($article)): ?>
+                <?php for ($i = 1; $i <= 6; $i++) : ?>
+                    <span class="pr-1">
+                        <input type="text" id="tag_<?php echo $i ?>" name="tag_<?php echo $i ?>" value="<?php echo $article->{"tag_" . $i} ?>" style="display:none">
+                        <?php if (!empty($article->{"tag_" . $i})): ?>
+                            <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_<?php echo $i ?>_view" onclick="location.href='/articles/search?tag=<?php echo $article->{'tag_' . $i} ?>'"><?php echo $article->{"tag_" . $i} ?></button>
+                        <?php else: ?>
+                            <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_<?php echo $i ?>_view" style="display:none"></button>
+                        <?php endif; ?>
+                    </span>
+                <? endfor; ?>
+            <?php endif; ?>
         </div>
     </div>
 
     <!-- 記事本文 -->
     <div class="row pb-5">
         <div class="col-12 ql-container ql-snow">
-            <textarea id="text" name="text" style="display:none"><?php echo $article->text ?></textarea>
-            <div class="ql-editor" id ='text_view'><?php echo $article->text ?></div>
+            <?php if(!empty($article)): ?>
+                <textarea id="text" name="text" style="display:none"><?php echo $article->text ?></textarea>
+                <div class="ql-editor" id ='text_view'><?php echo $article->text ?></div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

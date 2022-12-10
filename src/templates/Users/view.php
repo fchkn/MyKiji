@@ -4,22 +4,34 @@
  * @var iterable<\App\Model\Entity\User> $users
  */
 ?>
-<?= $this->Flash->render() ?>
 <div class="container-fluid h-100">
     <div class="row pt-5">
         <div class="col-8 align-self-center text-left pl-5">
+        <?php if(!empty($user)): ?>
+            <!-- プロフィール画像 -->
             <img src="/upload/profile_img/user_<?php echo $user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img" class="img-thumbnail mr-1" style="max-width:100px; max-height:100px; min-width:60px; min-height:60px;">
+            <!-- ユーザー名 -->
             <span class="h3 text-secondary ml-3"><?php echo $user->name ?></span>
+        <?php else: ?>
+            <!-- プロフィール画像 -->
+            <img src="/img/default_icon.jpg" alt="profile_img" class="img-thumbnail mr-1" style="max-width:100px; max-height:100px; min-width:60px; min-height:60px;">
+            <!-- ユーザー名 -->
+            <span class="h3 text-secondary ml-3">不明なユーザー</span>
+        <?php endif; ?>
         </div>
         <div class="col-4 align-self-center text-right pr-5">
             <?php if($isMypage): ?>
+                <!-- 記事投稿ボタン -->
                 <p class="mb-3"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
+                <!-- アカウント設定ボタン -->
                 <p class="m-0"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/edit'" value="アカウント設定"/></p>
             <?php else: ?>
                 <?php if ($hasAuth): ?>
                     <?php if ($hasFollow): ?>
+                        <!-- フォロー中ボタン -->
                         <p><input type="button" class="btn btn-primary btn-sm" onclick="location.href='/follows/delete?follow_user_id=<?php echo $user->id ?>'" value="フォロー中"/></p>
                     <?php else: ?>
+                        <!-- フォローボタン -->
                         <p><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/follows/add?follow_user_id=<?php echo $user->id ?>'" value="フォローする"/></p>
                     <?php endif; ?>
                 <? endif; ?>
@@ -28,23 +40,55 @@
 
         <div class="col-12 mt-5 p-0">
             <ul class="nav nav-tabs">
+                <!-- 投稿記事ナビゲーションタブ -->
                 <li class="nav-item">
-                    <a class="nav-link text-secondary border-left-0 active" data-toggle="tab" href="#post_article">投稿記事(<?= $this->Paginator->counter('{{count}}', ['model' => 'articles']) ?>)</a>
+                    <a class="nav-link text-secondary border-left-0 active" data-toggle="tab" href="#post_article">
+                        投稿記事(<?php
+                            if (!empty($post_articles)) {
+                                echo $this->Paginator->counter('{{count}}', ['model' => 'articles']);
+                            } else {
+                                echo "0";
+                            }
+                        ?>)
+                    </a>
                 </li>
                 <?php if ($isMypage): ?>
+                    <!-- お気に入り記事ナビゲーションタブ -->
                     <li class="nav-item">
-                        <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">お気に入り記事(<?= $this->Paginator->counter('{{count}}', ['model' => 'favorites']) ?>)</a>
+                        <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">
+                            お気に入り記事(<?php
+                                if (!empty($favorites)) {
+                                    echo $this->Paginator->counter('{{count}}', ['model' => 'favorites']);
+                                } else {
+                                    echo "0";
+                                }
+                            ?>)
+                        </a>
                     </li>
                 <?php endif; ?>
+                <!-- フォローナビゲーションタブ -->
                 <li class="nav-item">
-                    <li class="nav-item">
-                        <a class="nav-link text-secondary" data-toggle="tab" href="#follow">フォロー(<?= $this->Paginator->counter('{{count}}', ['model' => 'follows']) ?>)</a>
-                    </li>
+                    <a class="nav-link text-secondary" data-toggle="tab" href="#follow">
+                        フォロー(<?php
+                            if (!empty($follows)) {
+                                echo $this->Paginator->counter('{{count}}', ['model' => 'follows']);
+                            } else {
+                                echo "0";
+                            }
+                        ?>)
+                    </a>
                 </li>
+                <!-- フォロワーナビゲーションタブ -->
                 <li class="nav-item">
-                    <li class="nav-item">
-                        <a class="nav-link text-secondary" data-toggle="tab" href="#follower">フォロワー(<?= $this->Paginator->counter('{{count}}', ['model' => 'followers']) ?>)</a>
-                    </li>
+                    <a class="nav-link text-secondary" data-toggle="tab" href="#follower">
+                        フォロワー(<?php
+                            if (!empty($followers)) {
+                                echo $this->Paginator->counter('{{count}}', ['model' => 'followers']);
+                            } else {
+                                echo "0";
+                            }
+                        ?>)
+                    </a>
                 </li>
             </ul>
         </div>

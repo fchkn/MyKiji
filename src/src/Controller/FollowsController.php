@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Datasource\ConnectionManager;
+
 /**
  * Follows Controller
  *
@@ -16,18 +18,46 @@ class FollowsController extends AppController
      */
     public function add()
     {
-        $follow_user_id = $this->request->getQuery('follow_user_id');
-        $follow = $this->Follows->newEmptyEntity();
+        // トランザクション開始
+        $connection = ConnectionManager::get('default');
+        $connection->begin();
 
-        $this->Follows->patchEntity($follow, [
-            'user_id' => $this->auth_user->id,
-            'follow_user_id' => $follow_user_id
-        ]);
+        try {
+            $follow_user_id = $this->request->getQuery('follow_user_id');
+            $follow = $this->Follows->newEmptyEntity();
 
-        if ($this->Follows->save($follow)) {
-            return $this->redirect($this->referer());
+            $this->Follows->patchEntity($follow, [
+                'user_id' => $this->auth_user->id,
+                'follow_user_id' => $follow_user_id
+            ]);
+            $this->Follows->saveOrFail($follow);
+
+            // コミット
+            $connection->commit();
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            // バリデーション違反時の例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            $this->Flash->error(__('フォローできませんでした。'));
+        } catch (\Exception $e) {
+            // その他例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+
+            $this->Flash->error(__('異常なエラーが発生しました。'));
         }
-        $this->Flash->error(__('The follow could not be saved. Please, try again.'));
 
         return $this->redirect($this->referer());
     }
@@ -37,18 +67,47 @@ class FollowsController extends AppController
      */
     public function delete()
     {
-        $follow_user_id = $this->request->getQuery('follow_user_id');
-        $follow_id = $this->Follows->find()->where([
-            'user_id' => $this->auth_user->id,
-            'follow_user_id' => $follow_user_id
-        ])->first()->id;
+        // トランザクション開始
+        $connection = ConnectionManager::get('default');
+        $connection->begin();
 
-        $follow = $this->Follows->get($follow_id);
+        try {
+            $follow_user_id = $this->request->getQuery('follow_user_id');
+            $follow_id = $this->Follows->find()->where([
+                'user_id' => $this->auth_user->id,
+                'follow_user_id' => $follow_user_id
+            ])->first()->id;
 
-        if ($this->Follows->delete($follow)) {
-            return $this->redirect($this->referer());
+            $follow = $this->Follows->get($follow_id);
+
+            $this->Follows->deleteOrFail($follow);
+
+            // コミット
+            $connection->commit();
+        } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+            // バリデーション違反時の例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            $this->Flash->error(__('フォローを外せませんでした。'));
+        } catch (\Exception $e) {
+            // その他例外処理
+
+            // ロールバック
+            $connection->rollback();
+
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+
+            $this->Flash->error(__('異常なエラーが発生しました。'));
         }
-        $this->Flash->error(__('The follow could not be deleted. Please, try again.'));
 
         return $this->redirect($this->referer());
     }
