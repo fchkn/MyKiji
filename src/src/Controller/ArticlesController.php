@@ -138,51 +138,63 @@ class ArticlesController extends AppController
         $search = "";
         $search_articles = [];
         $order = "desc";
-
-        if (!empty($q['order']) && $q['order'] == "asc") {
-            // 昇順でソートの場合
-            $order = "asc";
-        }
-
-        if (!empty($q['word'])) {
-            // 検索バーから検索の場合
-            $target = "word";
-            $search = $q['word'];
-            $search_articles = $this->paginate($this->Articles->find('all', [
-                'conditions' => ['OR' => [
-                    'Articles.title LIKE' => '%' . $search . '%',
-                    'Articles.tag_1' => $search,
-                    'Articles.tag_2' => $search,
-                    'Articles.tag_3' => $search,
-                    'Articles.tag_4' => $search,
-                    'Articles.tag_5' => $search,
-                    'Articles.tag_6' => $search,
-                ]],
-                'contain' => ['Users'],
-                'order' => ['Articles.created' => $order],
-            ]))->toArray();
-        } else if (!empty($q['tag'])) {
-            // タグから検索の場合
-            $target = "tag";
-            $search = $q['tag'];
-            $search_articles = $this->paginate($this->Articles->find('all', [
-                'conditions' => ['OR' => [
-                    'Articles.tag_1' => $search,
-                    'Articles.tag_2' => $search,
-                    'Articles.tag_3' => $search,
-                    'Articles.tag_4' => $search,
-                    'Articles.tag_5' => $search,
-                    'Articles.tag_6' => $search,
-                ]],
-                'contain' => ['Users'],
-                'order' => ['Articles.created' => $order],
-            ]))->toArray();
-        } else {
-            // クエリパラメータが存在しない場合はトップ画面に遷移させる
-            return $this->redirect(['controller' => 'Top', 'action' => 'index']);
-        }
-
         $hasPaginator = true;
+
+        try {
+            if (!empty($q['order']) && $q['order'] == "asc") {
+                // 昇順でソートの場合
+                $order = "asc";
+            }
+
+            if (!empty($q['word'])) {
+                // 検索バーから検索の場合
+                $target = "word";
+                $search = $q['word'];
+                $search_articles = $this->paginate($this->Articles->find('all', [
+                    'conditions' => ['OR' => [
+                        'Articles.title LIKE' => '%' . $search . '%',
+                        'Articles.tag_1' => $search,
+                        'Articles.tag_2' => $search,
+                        'Articles.tag_3' => $search,
+                        'Articles.tag_4' => $search,
+                        'Articles.tag_5' => $search,
+                        'Articles.tag_6' => $search,
+                    ]],
+                    'contain' => ['Users'],
+                    'order' => ['Articles.created' => $order],
+                ]))->toArray();
+            } else if (!empty($q['tag'])) {
+                // タグから検索の場合
+                $target = "tag";
+                $search = $q['tag'];
+                $search_articles = $this->paginate($this->Articles->find('all', [
+                    'conditions' => ['OR' => [
+                        'Articles.tag_1' => $search,
+                        'Articles.tag_2' => $search,
+                        'Articles.tag_3' => $search,
+                        'Articles.tag_4' => $search,
+                        'Articles.tag_5' => $search,
+                        'Articles.tag_6' => $search,
+                    ]],
+                    'contain' => ['Users'],
+                    'order' => ['Articles.created' => $order],
+                ]))->toArray();
+            } else {
+                // クエリパラメータが存在しない場合はトップ画面に遷移させる
+                return $this->redirect(['controller' => 'Top', 'action' => 'index']);
+            }
+        } catch (\Exception $e) {
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+        
+            $this->Flash->error(__('異常なエラーが発生しました。'));
+        }
 
         $this->set(compact('target', 'search', 'search_articles', 'order' ,'hasPaginator'));
     }
