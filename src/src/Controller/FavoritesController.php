@@ -89,7 +89,7 @@ class FavoritesController extends AppController
             // ロールバック
             $connection->rollback();
 
-            $this->Flash->error(__('お気に入りから外せませんでした'));
+            $this->Flash->error(__('お気に入りから外せませんでした。'));
         } catch (\Exception $e) {
             // その他例外処理
 
