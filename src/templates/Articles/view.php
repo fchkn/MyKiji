@@ -10,26 +10,24 @@
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
 <div class="container-fluid">
     <?php if ($hasAuth && !$hasError && $auth_user->id == $article->user_id): ?>
-        <div class="row py-3 border-bottom">
-            <!-- 記事編集ボタン -->
-            <div class="col-4 d-flex align-self-center justify-content-end">
-                <button type="button" class="text-center" data-toggle="modal" data-target="#article_editor_modal">
-                    <img class="pb-2 rounded-circle icon" src="/img/article_create_icon.png" alt="create_icon">
-                    <p class="m-0 text-secondary">記事を編集する</p>
+        <div class="row article-edit-bar">
+            <div class="col-8 px-0 d-flex align-self-center justify-content-start">
+                <!-- 記事編集ボタン -->
+                <button type="button" class="d-flex align-items-center border-bottom" data-toggle="modal" data-target="#article_editor_modal">
+                    <img class="rounded-circle icon article-edit-icon" src="/img/article_create_icon.png" alt="create_icon">
+                    <span class="text-secondary">記事を編集する</span>
+                </button>
+                <!-- 記事保存ボタン -->
+                <button type='button' class="d-flex align-items-center border-bottom border-left" name="edit_article" onclick="clickEditArticle(<?php echo $article->id ?>)">
+                    <img class="pr-2 rounded-circle icon article-edit-icon" src="/img/article_post_icon.png" alt="post_icon">
+                    <span class="text-secondary">編集内容を保存する</span>
                 </button>
             </div>
-            <!-- 記事保存ボタン -->
-            <div class="col-4 d-flex align-self-center justify-content-center">
-                <button type='submit' name="edit_article" onclick="clickEditArticle(<?php echo $article->id ?>)">
-                    <img class="pb-2 rounded-circle icon" src="/img/article_post_icon.png" alt="post_icon">
-                    <p class="m-0 text-secondary">編集内容を保存する</p>
-                </button>
-            </div>
-            <!-- 記事削除ボタン -->
-            <div class="col-4 d-flex align-self-center justify-content-start">
-                <button type='submit' name="delete_article" onclick="clickDeleteArticle(<?php echo $article->id ?>)">
-                    <img class="pb-2 rounded-circle icon" src="/img/article_delete_icon.png" alt="delete_icon">
-                    <p class="m-0 text-secondary">記事を削除する</p>
+            <div class="col-4 px-0 d-flex align-self-center justify-content-end">
+                <!-- 記事削除ボタン -->
+                <button type='button' class="d-flex align-items-center border-bottom border-left" name="delete_article" onclick="clickDeleteArticle(<?php echo $article->id ?>)">
+                    <img class="rounded-circle icon article-edit-icon" src="/img/article_delete_icon.png" alt="delete_icon">
+                    <span class="text-secondary">記事を削除する</span>
                 </button>
             </div>
         </div>

@@ -11,19 +11,20 @@
 <div class="container-fluid">
 
     <!-- 記事編集・投稿ボタン -->
+    <div class="row article-edit-bar">
+        <div class="col-12 px-0 align-self-center d-flex justify-content-start">
+            <button type="button" class="d-flex align-items-center border-bottom" data-toggle="modal" data-target="#article_editor_modal">
+                <img class="rounded-circle icon article-edit-icon" src="/img/article_create_icon.png" alt="save_icon">
+                <span class="text-secondary">記事を書く</span>
+            </button>
+            <button type='button' class="d-flex align-items-center border-bottom border-left" name="add_article" onclick="clickAddArticle()">
+                <img class="pr-2 rounded-circle icon article-edit-icon" src="/img/article_post_icon.png" alt="save_icon">
+                <span class="text-secondary">記事を投稿する</span>
+            </button>
+        </div>
+    </div>
+
     <div class="row pt-5 border-bottom">
-        <div class="col-6 pr-5 align-self-center d-flex justify-content-end">
-            <button type="button" class="text-center" data-toggle="modal" data-target="#article_editor_modal">
-                <img class="pb-2 rounded-circle icon" src="/img/article_create_icon.png" alt="save_icon">
-                <p class="m-0 text-secondary">記事を書く</p>
-            </button>
-        </div>
-        <div class="col-6 d-flex align-self-center justify-content-start">
-            <button type='submit' name="add_article" onclick="clickAddArticle()">
-                <img class="pb-2 rounded-circle icon" src="/img/article_post_icon.png" alt="save_icon">
-                <p class="m-0 text-secondary">記事を投稿する</p>
-            </button>
-        </div>
         <div class="col-12 pt-3 align-self-center justify-content-end">
             <h6 class="text-secondary">プレビュー</h6>
         </div>
