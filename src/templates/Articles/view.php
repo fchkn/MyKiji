@@ -33,82 +33,54 @@
         </div>
     <?php endif; ?>
 
-    <div class="row pt-5 align-items-center">
-        <!-- プロフィール画像 -->
-        <div class="col-1">
-            <?php if(!empty($user)): ?>
-                <button type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
-                    <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img">
-                </button>
-            <?php else: ?>
-                <button type='button'>
-                    <img class="img-thumbnail mr-1 userimg-article" src="/img/default_icon.jpg" alt="profile_img">
-                </button>
-            <?php endif; ?>
-        </div>
-        <!-- ユーザー名・投稿日・更新日 -->
+    <div class="row px-5 pt-5 align-items-center">
+        <!-- プロフィール画像・ユーザー名・投稿日・更新日 -->
         <div class="col-9">
             <?php if(!empty($user)): ?>
-                <p class="m-0 text-secondary"><?php echo $user->name ?></p>
+                <button class="pl-0" type='button' onclick="location.href='/users/view?user_id=<?php echo $user->id?>'">
+                    <img class="img-thumbnail mr-1 userimg-article" src="/upload/profile_img/user_<?php echo $user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img">
+                </button>
+                <span class="text-secondary"><?php echo $user->name ?></span>
             <?php else: ?>
-                <p class="m-0 text-secondary">不明なユーザー</p>
+                <button class="pl-0" type='button'>
+                    <img class="img-thumbnail mr-1 userimg-article" src="/img/default_icon.jpg" alt="profile_img">
+                </button>
+                <span class="text-secondary">不明なユーザー</span>
             <?php endif; ?>
             <?php if(!empty($article)): ?>
-                <p class="m-0 text-secondary">投稿日: <?php echo date('Y/m/d G:i',  strtotime($article->created)) ?>&emsp;更新日: <?php echo date('Y/m/d G:i',  strtotime($article->modified)) ?></p>
+                <div class="row mt-2 mb-0 text-secondary">
+                    <div class="col-auto pr-0">投稿日: <?php echo date('Y/m/d G:i',  strtotime($article->created)) ?></div>
+                    <div class="col-auto">更新日: <?php echo date('Y/m/d G:i',  strtotime($article->modified)) ?></div>
+                </div>
             <?php else: ?>
-                <p class="m-0 text-secondary">投稿日: &emsp;更新日: </p>
+                <div class="row mt-2 mb-0 text-secondary">
+                    <div class="col-auto pr-0">投稿日: </div>
+                    <div class="col-auto">更新日: </div>
+                </p>
             <?php endif; ?>
         </div>
-        <!-- お気に入りボタン・フォローボタン -->
+        <!-- お気に入りボタン -->
         <?php if (!$hasAuth && !$hasError): ?>
-            <div class ="col-1 text-right">
-                <abbr title="お気に入りに追加する場合はログインが必要です">
-                    <button type="button">
-                        <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" alt="favorite_img">
-                    </button>
-                </abbr>
-            </div>
-            <div class ="col-1 p-0">
-                <abbr title="フォローする場合はログインが必要です">
-                    <button type="button">
-                        <img class="icon-follow" src="/img/follow_invalid_icon.png" alt="follow_img">
+            <div class ="col-md-3 mt-2 text-md-right">
+                <abbr title="ログインが必要です">
+                    <button class="pl-0" type="button">
+                        <span class="btn btn-secondary btn-sm">お気に入り追加</span>
                     </button>
                 </abbr>
             </div>
         <?php elseif ($hasAuth && !$hasError): ?>
             <?php if ($user->id != $auth_user->id): ?>
                 <?php if ($hasFavorite): ?>
-                    <div class ="col-1 text-right">
-                        <abbr title="記事をお気に入りから外す">
-                            <button type="button" onclick="location.href='/favorites/delete?article_id=<?php echo $article->id ?>'">
-                                <img class="icon-favorite" src="/img/article_favorite_enable_icon.png" alt="favorite_img">
-                            </button>
-                        </abbr>
+                    <div class ="col-md-3 mt-2 text-md-right">
+                        <button type="button" onclick="location.href='/favorites/delete?article_id=<?php echo $article->id ?>'">
+                            <span class="btn btn-primary btn-sm">お気に入り中</span>
+                        </button>
                     </div>
                 <?php else: ?>
-                    <div class ="col-1 text-right">
-                        <abbr title="記事をお気に入りに追加する">
-                            <button type="button" onclick="location.href='/favorites/add?article_id=<?php echo $article->id ?>'">
-                                <img class="icon-favorite" src="/img/article_favorite_invalid_icon.png" alt="favorite_img">
-                            </button>
-                        </abbr>
-                    </div>
-                <?php endif; ?>
-                <?php if ($hasFollow): ?>
-                    <div class ="col-1 p-0">
-                        <abbr title="投稿者のフォローを外す">
-                            <button type="button" onclick="location.href='/follows/delete?follow_user_id=<?php echo $user->id ?>'">
-                                <img class="icon-follow" src="/img/follow_enable_icon.png" alt="follow_img">
-                            </button>
-                        </abbr>
-                    </div>
-                <?php else: ?>
-                    <div class ="col-1 p-0">
-                        <abbr title="投稿者をフォローする">
-                            <button type="button" onclick="location.href='/follows/add?follow_user_id=<?php echo $user->id ?>'">
-                                <img class="icon-follow" src="/img/follow_invalid_icon.png" alt="follow_img">
-                            </button>
-                        </abbr>
+                    <div class ="col-md-3 mt-2 text-md-right">
+                        <button class="pl-0" type="button" onclick="location.href='/favorites/add?article_id=<?php echo $article->id ?>'">
+                            <span class="btn btn-secondary btn-sm">お気に入り追加</span>
+                        </button>
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
@@ -116,7 +88,7 @@
     </div>
 
     <!-- 記事タイトル -->
-    <div class="row py-3">
+    <div class="row px-5 pt-2 pb-3">
         <div class="col-12">
             <?php if(!empty($article)): ?>
                 <input type="text" id="title" name="title" value="<?php echo $article->title ?>" style="display:none"></input>
@@ -128,7 +100,7 @@
     </div>
 
     <!-- 記事タグ -->
-    <div class="row pb-5">
+    <div class="row px-5 pb-5">
         <div class="col-12">
             <?php if(!empty($article)): ?>
                 <?php for ($i = 1; $i <= 6; $i++) : ?>
@@ -146,7 +118,7 @@
     </div>
 
     <!-- 記事本文 -->
-    <div class="row pb-5">
+    <div class="row px-5 pb-5">
         <div class="col-12 ql-container ql-snow">
             <?php if(!empty($article)): ?>
                 <textarea id="text" name="text" style="display:none"><?php echo $article->text ?></textarea>
