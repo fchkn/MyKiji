@@ -18,6 +18,16 @@ main {
     max-width:40px;
 }
 
+.username-header {
+    font-size: 0.7em;
+    vertical-align: middle;
+    display: inline-block;
+    width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .icon-btn {
     background-color: transparent;
     border-style: none;
