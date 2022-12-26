@@ -2,7 +2,7 @@
     <?php foreach ($follows as $follow) : ?>
         <!-- 記事リスト要素 -->
         <a href="/users/view?user_id=<?php echo $follow->{$target . '_user'}->id?>" style="text-decoration: none;">
-            <div class="list-group-item list-group-item-action">
+            <div class="list-group-item list-group-item-action mb-4 border-top rounded">
                 <div class="row align-items-center">
                     <div class="col-auto pr-0">
                         <!-- プロフィール画像 -->

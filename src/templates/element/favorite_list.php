@@ -1,7 +1,7 @@
 <div class="list-group px-5">
     <?php foreach ($favorites as $favorite) : ?>
         <!-- 記事リスト要素 -->
-        <div class="list-group-item list-group-item-action">
+        <div class="list-group-item list-group-item-action mb-4 border-top rounded">
             <div class="row align-items-center">
                 <div class="col-auto pr-0">
                     <!-- プロフィール画像 -->
