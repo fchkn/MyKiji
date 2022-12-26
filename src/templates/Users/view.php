@@ -32,14 +32,14 @@
         <div class="col-4 align-self-start text-right pr-5">
             <?php if($isMypage): ?>
                 <!-- 記事投稿ボタン -->
-                <p class="mb-3"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
+                <p class="mb-3"><input type="button" class="btn btn-info btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
                 <!-- アカウント設定ボタン -->
-                <p class="m-0"><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/edit'" value="アカウント設定"/></p>
+                <p class="m-0"><input type="button" class="btn btn-info btn-sm" onclick="location.href='/users/edit'" value="アカウント設定"/></p>
             <?php else: ?>
                 <?php if ($hasAuth): ?>
                     <?php if ($hasFollow): ?>
                         <!-- フォロー中ボタン -->
-                        <p><input type="button" class="btn btn-primary btn-sm" onclick="location.href='/follows/delete?follow_user_id=<?php echo $user->id ?>'" value="フォロー中"/></p>
+                        <p><input type="button" class="btn btn-info btn-sm" onclick="location.href='/follows/delete?follow_user_id=<?php echo $user->id ?>'" value="フォロー中"/></p>
                     <?php else: ?>
                         <!-- フォローボタン -->
                         <p><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/follows/add?follow_user_id=<?php echo $user->id ?>'" value="フォローする"/></p>

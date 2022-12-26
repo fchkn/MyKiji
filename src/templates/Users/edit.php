@@ -55,7 +55,7 @@
         <div class="col-lg-3 text-lg-right mt-lg-0 text-center mt-4">
             <!-- プロフィール情報保存ボタン -->
             <?= $this->Form->button('変更を保存', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'id' => 'profile_save_btn',
                 'onclick'=>'targetSubmit("profileinfo")'
@@ -81,7 +81,7 @@
         <div class="col-lg-3 text-lg-right mt-lg-0 text-center mt-4">
             <!-- メールアドレス保存ボタン -->
             <?= $this->Form->button('変更を保存', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'onclick'=>'targetSubmit("email")'
             ]) ?>
@@ -126,7 +126,7 @@
         <div class="col-lg-3 text-lg-right mt-lg-0 text-center mt-4">
             <!-- パスワード保存ボタン -->
             <?= $this->Form->button('変更を保存', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'onclick'=>'targetSubmit("password")'
             ]) ?>
@@ -146,7 +146,7 @@
         <div class="col-lg-4 text-lg-right mt-lg-0 text-center mt-4">
             <!-- 退会手続きボタン -->
             <?= $this->Form->button('退会手続きに進む', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'onclick'=> 'location.href=\'/users/delete\''
             ]) ?>
@@ -156,7 +156,7 @@
     <div class="row py-5 justify-content-center">
         <!-- 戻るボタン -->
         <?= $this->Form->button('Myページに戻る', [
-            'class' => 'btn btn-secondary btn-lg',
+            'class' => 'btn btn-info btn-lg',
             'type' => 'button',
             'onclick'=> 'location.href=\'/users/view?user_id=' . $auth_user->id . '\''
         ]) ?>

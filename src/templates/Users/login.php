@@ -36,7 +36,7 @@
         <div class="col-12 my-4 align-self-center text-center">
             <!-- ログインボタン -->
             <?= $this->Form->button('ログイン', [
-                'class' => 'btn btn-secondary btn-lg',
+                'class' => 'btn btn-info btn-lg',
                 'type' => 'button',
                 'onclick'=>'submit()'
             ]) ?>

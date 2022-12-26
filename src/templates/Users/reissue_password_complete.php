@@ -19,7 +19,7 @@
         </div>
         <div class="col-12 mb-4"></div>
         <div class="col-12 mb-4 align-self-center text-center">
-            <input type="button" class="btn btn-secondary btn-lg" onclick="location.href='/users/login'" value="ログイン画面へ"/>
+            <input type="button" class="btn btn-info btn-lg" onclick="location.href='/users/login'" value="ログイン画面へ"/>
         </div>
     </div>
 </div>

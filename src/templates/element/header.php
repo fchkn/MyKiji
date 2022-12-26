@@ -21,9 +21,9 @@
         <?php else: ?>
             <div class="col order-md-3 align-self-center text-md-center text-right">
                 <!-- ログインボタン -->
-                <input type="button" class="btn btn-secondary btn-sm mr-2" onclick="location.href='/users/login'" value="ログイン"/>
+                <input type="button" class="btn btn-info btn-sm mr-2" onclick="location.href='/users/login'" value="ログイン"/>
                 <!-- 新規登録ボタン -->
-                <input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/users/add'" value="新規登録"/>
+                <input type="button" class="btn btn-info btn-sm" onclick="location.href='/users/add'" value="新規登録"/>
             </div>
         <?php endif; ?>
         <!-- 検索バー -->

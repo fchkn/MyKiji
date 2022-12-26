@@ -73,7 +73,7 @@
                 <?php if ($hasFavorite): ?>
                     <div class ="col-md-3 mt-2 text-md-right">
                         <button type="button" onclick="location.href='/favorites/delete?article_id=<?php echo $article->id ?>'">
-                            <span class="btn btn-primary btn-sm">お気に入り中</span>
+                            <span class="btn btn-info btn-sm">お気に入り中</span>
                         </button>
                     </div>
                 <?php else: ?>
