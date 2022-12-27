@@ -2,7 +2,9 @@
     <div class="row py-4">
         <!-- サイトロゴ -->
         <div class="col-3 order-md-1 align-self-center text-center">
-            <h1><a href="<?= $this->Url->build('/') ?>">MyKiji</a></h1>
+            <a href="<?= $this->Url->build('/') ?>">
+                <img src="/img/mykiji_logo.png" class="logoimg" alt="mykiji_logo">
+            </a>
         </div>
         <?php if($hasAuth): ?>
             <!-- ユーザーメニュー -->
