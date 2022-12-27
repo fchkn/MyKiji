@@ -31,7 +31,7 @@
             <?= $this->Form->error('password') ?>
         </div>
         <div class="col-12 mb-4 align-self-center text-center">
-            <a href="/users/send_reissue_password_mail">パスワードを忘れた場合</a>
+            <a href="/users/send_reissue_password_mail" class="text-info">パスワードを忘れた場合</a>
         </div>
         <div class="col-12 my-4 align-self-center text-center">
             <!-- ログインボタン -->
