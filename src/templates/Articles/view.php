@@ -6,26 +6,26 @@
  */
 ?>
 <?= $this->Flash->render() ?>
-<form method="post" name="articles_view_form" style="height: 100%">
+<form method="post" name="articles_view_form" style="height: 100%; background: #f5f5f5;">
 <input type="hidden" name="_csrfToken" autocomplete="off" value="<?= $this->request->getAttribute('csrfToken') ?>">
-<div class="container-fluid">
+<div class="container-fluid bg-white" style="max-width: 850px">
     <?php if ($hasAuth && !$hasError && $auth_user->id == $article->user_id): ?>
         <div class="row article-edit-bar">
             <div class="col-8 px-0 d-flex align-self-center justify-content-start">
                 <!-- 記事編集ボタン -->
-                <button type="button" class="d-flex align-items-center border-bottom" data-toggle="modal" data-target="#article_editor_modal">
+                <button type="button" class="d-flex align-items-center border border-top-0" data-toggle="modal" data-target="#article_editor_modal">
                     <img class="rounded-circle icon article-edit-icon" src="/img/article_create_icon.png" alt="create_icon">
                     <span class="text-secondary">記事を編集する</span>
                 </button>
                 <!-- 記事保存ボタン -->
-                <button type='button' class="d-flex align-items-center border-bottom border-left" name="edit_article" onclick="clickEditArticle(<?php echo $article->id ?>)">
+                <button type='button' class="d-flex align-items-center border border-top-0" name="edit_article" onclick="clickEditArticle(<?php echo $article->id ?>)">
                     <img class="pr-2 rounded-circle icon article-edit-icon" src="/img/article_post_icon.png" alt="post_icon">
                     <span class="text-secondary">編集内容を保存する</span>
                 </button>
             </div>
             <div class="col-4 px-0 d-flex align-self-center justify-content-end">
                 <!-- 記事削除ボタン -->
-                <button type='button' class="d-flex align-items-center border-bottom border-left" name="delete_article" onclick="clickDeleteArticle(<?php echo $article->id ?>)">
+                <button type='button' class="d-flex align-items-center border border-top-0" name="delete_article" onclick="clickDeleteArticle(<?php echo $article->id ?>)">
                     <img class="rounded-circle icon article-edit-icon" src="/img/article_delete_icon.png" alt="delete_icon">
                     <span class="text-secondary">記事を削除する</span>
                 </button>
