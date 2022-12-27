@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid border-bottom">
     <div class="row py-4">
         <!-- サイトロゴ -->
         <div class="col-3 order-md-1 align-self-center text-center">

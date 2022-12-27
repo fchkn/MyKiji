@@ -35,7 +35,7 @@
                 <div class="text-danger" id="modal_text_size_error" style="display:none"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-secondary" id="modal_save" onclick="clickModalSave()">一時保存</button>
+                <button type="button" class="btn btn-sm btn-info" id="modal_save" onclick="clickModalSave()">一時保存</button>
             </div>
         </div>
     </div>
