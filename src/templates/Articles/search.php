@@ -6,7 +6,7 @@
  */
 ?>
 <?= $this->Flash->render() ?>
-<div class="container-fluid h-100">
+<div class="container-fluid h-100" style="background: #f5f5f5;">
     <div class="row pt-5 justify-content-center align-items-center">
         <!-- 検索ワード・タグ -->
         <?php if ($target == "word"): ?>

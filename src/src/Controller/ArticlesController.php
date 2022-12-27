@@ -33,7 +33,6 @@ class ArticlesController extends AppController
         $this->loadComponent('Paginator');
         $this->Users = TableRegistry::get('users');
         $this->Favorites = TableRegistry::get('favorites');
-        $this->Follows = TableRegistry::get('follows');
     }
 
     /**
@@ -44,7 +43,6 @@ class ArticlesController extends AppController
         $article = null;
         $user = null;
         $hasFavorite = false;
-        $hasFollow = false;
         $existing_imgs_size_csv = "";
         $hasError = false;
 
@@ -72,13 +70,6 @@ class ArticlesController extends AppController
                     'article_id' => $article_id])->first();
                 if(!empty($favorite)) {
                     $hasFavorite = true;
-                }
-                // フォローの有無を確認
-                $follow = $this->Follows->find()->where([
-                    'user_id' => $this->auth_user->id,
-                    'follow_user_id' => $user->id])->first();
-                if(!empty($follow)) {
-                    $hasFollow = true;
                 }
             }
 
@@ -122,7 +113,6 @@ class ArticlesController extends AppController
             'article',
             'user',
             'hasFavorite',
-            'hasFollow',
             'existing_imgs_size_csv',
             'redirect',
             'hasError',

@@ -29,7 +29,7 @@
         <div class="col-12 my-4 align-self-center text-center">
             <!-- 送信ボタン -->
             <?= $this->Form->button('　送信　', [
-                'class' => 'btn btn-secondary btn-lg',
+                'class' => 'btn btn-info btn-lg',
                 'type' => 'button',
                 'onclick'=>'submit()'
             ]) ?>

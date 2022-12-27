@@ -42,7 +42,7 @@
         <div class="col-12 my-4 align-self-center text-center">
             <!-- 登録ボタン -->
             <?= $this->Form->button('　登録　', [
-                'class' => 'btn btn-secondary btn-lg',
+                'class' => 'btn btn-info btn-lg',
                 'type' => 'button',
                 'onclick'=>'submit()'
             ]) ?>

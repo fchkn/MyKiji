@@ -25,39 +25,42 @@
         </div>
     </div>
     <div class="row mb-5 py-4">
-        <div class="col-8 align-self-center text-left">
-            <small class="text-muted">プロフィール画像</small>
+        <div class="col-lg-9 align-self-center">
+            <div class="row">
+                <div class="col-sm-12">
+                    <small class="text-muted">プロフィール画像</small>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <!-- プロフィール画像 -->
+                    <img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img" class="img-thumbnail mr-1" style="max-width:60px; max-height:60px;" id="profile_img_view">
+                </div>
+                <div class="col-sm-10 mt-2 align-self-center form-group">
+                    <!-- プロフィール画像選択ボタン -->
+                    <input type="file" class="form-control-file" id="profile_img" name="profile_img" value="ファイルを選択" style="max-width:300px;">
+                    <p class="m-0 text-secondary">設定できる画像は、2MB以内・JPG/PNG形式です。</p>
+                    <p class="m-0 text-danger" id="profile_img_type_error" style="display:none"></p>
+                    <p class="m-0 text-danger" id="profile_img_size_error" style="display:none"></p>
+                </div>
+                <div class="col-sm-12 mt-3">
+                    <small class="text-muted">ユーザー名</small>
+                    <!-- ユーザー名入力欄 -->
+                    <?= $this->Form->text('name', [
+                        'class' => 'form-control',
+                        'placeholder' => 'ユーザー名'
+                    ]) ?>
+                    <?= $this->Form->error('name', ['class' =>"text-danger"]) ?>
+                </div>
+            </div>
         </div>
-        <div class="col-4 text-right">
+        <div class="col-lg-3 text-lg-right mt-lg-0 text-center mt-4">
             <!-- プロフィール情報保存ボタン -->
             <?= $this->Form->button('変更を保存', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'id' => 'profile_save_btn',
                 'onclick'=>'targetSubmit("profileinfo")'
             ]) ?>
         </div>
-        <div class="col-2 text-left">
-            <!-- プロフィール画像 -->
-            <img src="/upload/profile_img/user_<?php echo $auth_user->id ?>.jpg?<?php echo $img_param ?>" alt="profile_img" class="img-thumbnail mr-1" style="min-width:60px; min-height:60px;" id="profile_img_view">
-        </div>
-        <div class="col-10 m-0 align-self-center text-left form-group">
-            <!-- プロフィール画像選択ボタン -->
-            <input type="file" class="form-control-file" id="profile_img" name="profile_img" value="ファイルを選択" style="max-width:300px;>
-            <p class="m-0 text-secondary">設定できる画像は、2MB以内・JPG/PNG形式です。</p>
-            <p class="m-0 text-danger" id="profile_img_type_error" style="display:none"></p>
-            <p class="m-0 text-danger" id="profile_img_size_error" style="display:none"></p>
-        </div>
-        <div class="col-8 mt-3 text-left">
-            <small class="text-muted">ユーザー名</small>
-            <!-- ユーザー名入力欄 -->
-            <?= $this->Form->text('name', [
-                'class' => 'form-control',
-                'placeholder' => 'ユーザー名'
-            ]) ?>
-            <?= $this->Form->error('name', ['class' =>"text-danger"]) ?>
-        </div>
-        <div class="col-4"></div>
     </div>
 
     <!-- メールアドレス -->
@@ -67,7 +70,7 @@
         </div>
     </div>
     <div class="row mb-5 py-4">
-        <div class="col-8 text-left">
+        <div class="col-lg-9">
             <!-- メールアドレス入力欄 -->
             <?= $this->Form->text('email', [
                 'class' => 'form-control',
@@ -75,10 +78,10 @@
             ]) ?>
             <?= $this->Form->error('email', ['class' =>"text-danger"]) ?>
         </div>
-        <div class="col-4 text-right">
+        <div class="col-lg-3 text-lg-right mt-lg-0 text-center mt-4">
             <!-- メールアドレス保存ボタン -->
             <?= $this->Form->button('変更を保存', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'onclick'=>'targetSubmit("email")'
             ]) ?>
@@ -92,40 +95,42 @@
         </div>
     </div>
     <div class="row mb-5 py-4">
-        <div class="col-8 text-left">
-            <!-- 現在のパスワード入力欄 -->
-            <?= $this->Form->text('password_curt', [
-                'class' => 'form-control',
-                'placeholder' => '現在のパスワード'
-            ]) ?>
-            <?= $this->Form->error('password_curt', ['class' =>"text-danger"]) ?>
+        <div class="col-lg-9">
+            <div class="row">
+                <div class="col-12">
+                    <!-- 現在のパスワード入力欄 -->
+                    <?= $this->Form->text('password_curt', [
+                        'class' => 'form-control',
+                        'placeholder' => '現在のパスワード'
+                    ]) ?>
+                    <?= $this->Form->error('password_curt', ['class' =>"text-danger"]) ?>
+                </div>
+                <div class="col-12 mt-3">
+                    <!-- 新しいパスワード入力欄 -->
+                    <?= $this->Form->text('password', [
+                        'class' => 'form-control',
+                        'placeholder' => '新しいパスワード'
+                    ]) ?>
+                    <?= $this->Form->error('password', ['class' =>"text-danger"]) ?>
+                </div>
+                <div class="col-12 mt-3">
+                    <!-- 新しいパスワード再入力欄 -->
+                    <?= $this->Form->text('password_re', [
+                        'class' => 'form-control',
+                        'placeholder' => '新しいパスワード（再入力）'
+                    ]) ?>
+                    <?= $this->Form->error('password_re', ['class' =>"text-danger"]) ?>
+                </div>
+            </div>
         </div>
-        <div class="col-4 text-right">
+        <div class="col-lg-3 text-lg-right mt-lg-0 text-center mt-4">
             <!-- パスワード保存ボタン -->
             <?= $this->Form->button('変更を保存', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'onclick'=>'targetSubmit("password")'
             ]) ?>
         </div>
-        <div class="col-8 mt-3 text-left">
-            <!-- 新しいパスワード入力欄 -->
-            <?= $this->Form->text('password', [
-                'class' => 'form-control',
-                'placeholder' => '新しいパスワード'
-            ]) ?>
-            <?= $this->Form->error('password', ['class' =>"text-danger"]) ?>
-        </div>
-        <div class="col-4"></div>
-        <div class="col-8 mt-3 text-left">
-            <!-- 新しいパスワード再入力欄 -->
-            <?= $this->Form->text('password_re', [
-                'class' => 'form-control',
-                'placeholder' => '新しいパスワード（再入力）'
-            ]) ?>
-            <?= $this->Form->error('password_re', ['class' =>"text-danger"]) ?>
-        </div>
-        <div class="col-4"></div>
     </div>
 
     <!-- Myliji退会 -->
@@ -135,13 +140,13 @@
         </div>
     </div>
     <div class="row mb-5 py-4">
-        <div class="col-8 text-left">
+        <div class="col-lg-8 text-lg-left text-center">
             <span class="text-danger">※退会するとアカウントは復元できません。<br>&emsp;投稿した記事は全て削除されます。</span>
         </div>
-        <div class="col-4 text-right">
+        <div class="col-lg-4 text-lg-right mt-lg-0 text-center mt-4">
             <!-- 退会手続きボタン -->
             <?= $this->Form->button('退会手続きに進む', [
-                'class' => 'btn btn-secondary btn-sm',
+                'class' => 'btn btn-info btn-sm',
                 'type' => 'button',
                 'onclick'=> 'location.href=\'/users/delete\''
             ]) ?>
@@ -151,7 +156,7 @@
     <div class="row py-5 justify-content-center">
         <!-- 戻るボタン -->
         <?= $this->Form->button('Myページに戻る', [
-            'class' => 'btn btn-secondary btn-lg',
+            'class' => 'btn btn-info btn-lg',
             'type' => 'button',
             'onclick'=> 'location.href=\'/users/view?user_id=' . $auth_user->id . '\''
         ]) ?>

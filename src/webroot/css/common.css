@@ -13,9 +13,27 @@ main {
     border: solid 30px #f5f5f5;
 }
 
+.logoimg {
+    height: 70px;
+}
+
+.logoimg:hover {
+    opacity: 0.75;
+}
+
 .userimg-article {
     max-height:40px;
     max-width:40px;
+}
+
+.username-header {
+    font-size: 0.7em;
+    vertical-align: middle;
+    display: inline-block;
+    width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .icon-btn {
@@ -35,6 +53,15 @@ main {
 
 .list-group {
     width:800px;
+}
+
+.article-edit-bar {
+    background: #f5f5f5;
+}
+
+.article-edit-icon {
+    max-height:20px;
+    max-width:20px;
 }
 
 .error-message {

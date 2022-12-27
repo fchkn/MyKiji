@@ -1,6 +1,6 @@
 <div type="hidden" id="existing_imgs_size_csv" style="display:none;" data-val="<?=htmlspecialchars($existing_imgs_size_csv, ENT_QUOTES, 'UTF-8')?>"></div>
 <div class="modal fade" id="article_editor_modal" tabindex="-1" role="dialog" area-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="container">
@@ -35,7 +35,7 @@
                 <div class="text-danger" id="modal_text_size_error" style="display:none"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="modal_save" onclick="clickModalSave()">保存</button>
+                <button type="button" class="btn btn-sm btn-info" id="modal_save" onclick="clickModalSave()">一時保存</button>
             </div>
         </div>
     </div>
