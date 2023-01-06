@@ -44,7 +44,7 @@
                         <!-- フォローボタン -->
                         <p><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/follows/add?follow_user_id=<?php echo $user->id ?>'" value="フォローする"/></p>
                     <?php endif; ?>
-                <? endif; ?>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
 

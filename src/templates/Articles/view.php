@@ -110,7 +110,7 @@
                             <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_<?php echo $i ?>_view" style="display:none"></button>
                         <?php endif; ?>
                     </span>
-                <? endfor; ?>
+                <?php endfor; ?>
             <?php endif; ?>
         </div>
     </div>
