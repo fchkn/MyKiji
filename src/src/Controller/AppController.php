@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 
 /**
  * Application Controller
@@ -69,7 +70,10 @@ class AppController extends Controller
         // 画像キャッシュ回避用パラメータ
         $img_param = date('YmdHis');
 
-        $this->set(compact('hasAuth', 'auth_user', 'img_param'));
+        // バージョン設定
+        $mykiji_ver = Configure::read("mykiji_ver");
+
+        $this->set(compact('hasAuth', 'auth_user', 'img_param', 'mykiji_ver'));
 
         // 共通レイアウト適用
         $this->viewBuilder()->setLayout('common');

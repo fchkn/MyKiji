@@ -1,9 +1,13 @@
 <div class="container-fluid">
-    <div class="row py-4 bg-secondary">
+    <div class="row py-4 align-self-center bg-secondary text-white">
         <div class="col-1"></div>
-        <div class="col-1 align-self-center text-white"><h2>MyKiji</h2></div>
-        <div class="col-10"></div>
+        <div class="col-11 ">
+            <span class="h2">MyKiji</span>
+            <span class="h6"> ver.<?php echo $mykiji_ver; ?></span>
+        </div>
         <div class="col-1"></div>
-        <div class="col-11 align-self-center text-left text-white">© 2022 Masataka Saito</div>
-    </div>  
+        <div class="col-11">
+            <span class="h6">© 2022 Masataka Saito</span>
+        </div>
+    </div>
 </div>
