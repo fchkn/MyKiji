@@ -1,7 +1,7 @@
 <div class="container-fluid border-bottom">
     <div class="row py-4">
         <!-- サイトロゴ -->
-        <div class="col-3 order-md-1 align-self-center text-center">
+        <div class="col-3 order-md-1 align-self-center text-center ml-1">
             <a href="<?= $this->Url->build('/') ?>">
                 <img src="/img/mykiji_logo.png" class="logoimg" alt="mykiji_logo">
             </a>
@@ -21,11 +21,17 @@
                 </div>
             </div>
         <?php else: ?>
-            <div class="col order-md-3 align-self-center text-md-center text-right">
-                <!-- ログインボタン -->
-                <input type="button" class="btn btn-info btn-sm mr-2" onclick="location.href='/users/login'" value="ログイン"/>
-                <!-- 新規登録ボタン -->
-                <input type="button" class="btn btn-info btn-sm" onclick="location.href='/users/add'" value="新規登録"/>
+            <div class="col order-md-3 align-self-center text-right">
+                <div class="row mr-1 mr-md-0">
+                    <div class ="col-md p-0 text-md-right">
+                        <!-- ログインボタン -->
+                        <input type="button" class="btn btn-info btn-sm mr-0 mb-1 mr-md-2 mb-md-0" onclick="location.href='/users/login'" value="ログイン"/>
+                    </div>
+                    <div class ="col-md p-0 text-md-left">
+                        <!-- 新規登録ボタン -->
+                        <input type="button" class="btn btn-info btn-sm" onclick="location.href='/users/add'" value="新規登録"/>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
         <!-- 検索バー -->
