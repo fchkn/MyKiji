@@ -245,7 +245,6 @@ return [
             'client' => null,
             'tls' => false,
             'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
-            'from' => 'saitoDevtest@gmail.com',
         ],
     ],
 
