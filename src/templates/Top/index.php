@@ -3,7 +3,6 @@
  * @var \App\View\AppView $this
  */
 ?>
-<?= $this->Flash->render() ?>
 <div class="container-fluid h-100" style="background: #f5f5f5;">
     <div class="row pt-5 justify-content-center">
         <span class="text-secondary">最近投稿された記事</span>

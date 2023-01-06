@@ -31,11 +31,26 @@ class TopController extends AppController
      */
     public function index()
     {
-        $latest_articles = $this->Articles->find('all', [
-            'contain' => ['Users'],
-            'order' => ['Articles.created' => 'desc'],
-            'limit' => 10,
-        ])->toArray();
+        $latest_articles = [];
+
+        try {
+            $latest_articles = $this->Articles->find('all', [
+                'contain' => ['Users'],
+                'order' => ['Articles.created' => 'desc'],
+                'limit' => 10,
+            ])->toArray();
+        } catch (\Exception $e) {
+            // エラーログを出力
+            $error = implode("\n", [
+                "\nStatus Code: " . $e->getCode(),
+                "Message: " . $e->getMessage(),
+                "File: " . $e->getFile() . ", line " . $e->getLine(),
+                "Stack Trace:\n" . $e->getTraceAsString()
+            ]);
+            $this->log($error);
+        
+            $this->Flash->error(__('異常なエラーが発生しました。'));
+        }
 
         $hasPaginator = false;
 
