@@ -31,8 +31,8 @@ class ArticlesController extends AppController
     {
         parent::initialize();
         $this->loadComponent('Paginator');
-        $this->Users = TableRegistry::get('users');
-        $this->Favorites = TableRegistry::get('favorites');
+        $this->Users = TableRegistry::get('Users');
+        $this->Favorites = TableRegistry::get('Favorites');
     }
 
     /**

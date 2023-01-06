@@ -55,7 +55,7 @@
                     <a class="nav-link text-secondary border-left-0 active" data-toggle="tab" href="#post_article">
                         投稿記事(<?php
                             if (!empty($post_articles)) {
-                                echo $this->Paginator->counter('{{count}}', ['model' => 'articles']);
+                                echo $this->Paginator->counter('{{count}}', ['model' => 'Articles']);
                             } else {
                                 echo "0";
                             }
@@ -68,7 +68,7 @@
                         <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">
                             お気に入り記事(<?php
                                 if (!empty($favorites)) {
-                                    echo $this->Paginator->counter('{{count}}', ['model' => 'favorites']);
+                                    echo $this->Paginator->counter('{{count}}', ['model' => 'Favorites']);
                                 } else {
                                     echo "0";
                                 }
@@ -114,7 +114,7 @@
                         <h3 class="text-center text-secondary">投稿記事はありません</h3>
                     <?php else: ?>
                         <div class="row justify-content-center">
-                            <?= $this->element('article_list', ['articles' => $post_articles, 'model' => 'articles']) ?>
+                            <?= $this->element('article_list', ['articles' => $post_articles, 'model' => 'Articles']) ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -124,7 +124,7 @@
                         <h3 class="text-center text-secondary">お気に入り記事はありません</h3>
                     <?php else: ?>
                         <div class="row justify-content-center">
-                            <?= $this->element('favorite_list', ['articles' => $favorites, 'model' => 'favorites']) ?>
+                            <?= $this->element('favorite_list', ['articles' => $favorites, 'model' => 'Favorites']) ?>
                         </div>
                     <?php endif; ?>
                 </div>

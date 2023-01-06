@@ -40,10 +40,10 @@ class UsersController extends AppController
     {
         parent::initialize();
         $this->loadComponent('Paginator');
-        $this->Articles = TableRegistry::get('articles');
-        $this->Favorites = TableRegistry::get('favorites');
-        $this->Follows = TableRegistry::get('follows');
-        $this->Tokens = TableRegistry::get('tokens');
+        $this->Articles = TableRegistry::get('Articles');
+        $this->Favorites = TableRegistry::get('Favorites');
+        $this->Follows = TableRegistry::get('Follows');
+        $this->Tokens = TableRegistry::get('Tokens');
     }
 
     /**
@@ -75,17 +75,17 @@ class UsersController extends AppController
 
             // 投稿記事データ取得
             $post_articles = $this->paginate($this->Articles->find('all', [
-                'conditions' => ['articles.user_id' => $user_id],
+                'conditions' => ['Articles.user_id' => $user_id],
                 'contain' => ['Users'],
-                'order' => ['articles.created' => 'desc'],
-            ]), ['limit' => 5, 'scope' => 'articles'])->toArray();
+                'order' => ['Articles.created' => 'desc'],
+            ]), ['limit' => 5, 'scope' => 'Articles'])->toArray();
 
             // お気に入りデータ取得
             $favorites = $this->paginate($this->Favorites->find('all', [
-                'conditions' => ['favorites.user_id' => $user_id],
+                'conditions' => ['Favorites.user_id' => $user_id],
                 'contain' => ['Articles.Users'],
-                'order' => ['favorites.created' => 'desc'],
-            ]), ['limit' => 5,'scope' => 'favorites'])->toArray();
+                'order' => ['Favorites.created' => 'desc'],
+            ]), ['limit' => 5,'scope' => 'Favorites'])->toArray();
 
             // Followsのエイリアス名を一時退避
             $tmpAlias = $this->Follows->getAlias();

@@ -21,7 +21,7 @@ class TopController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->Articles = TableRegistry::get('articles');
+        $this->Articles = TableRegistry::get('Articles');
     }
 
     /**
@@ -33,7 +33,7 @@ class TopController extends AppController
     {
         $latest_articles = $this->Articles->find('all', [
             'contain' => ['Users'],
-            'order' => ['articles.created' => 'desc'],
+            'order' => ['Articles.created' => 'desc'],
             'limit' => 10,
         ])->toArray();
 
