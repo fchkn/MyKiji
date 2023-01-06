@@ -6,7 +6,7 @@
 ?>
 <div class="container-fluid h-100">
     <div class="row pt-5">
-        <div class="col-8 align-self-center text-left pl-5">
+        <div class="col-6 align-self-center text-left pl-4">
             <div class="row h-auto">
                 <?php if(!empty($user)): ?>
                     <!-- プロフィール画像 -->
@@ -15,21 +15,21 @@
                     </div>
                     <!-- ユーザー名 -->
                     <div class="col-sm-7 mt-sm-0 mt-2 align-self-center">
-                        <span class="h3 text-secondary"><?php echo $user->name ?></span>
+                        <span class="h4 text-secondary"><?php echo $user->name ?></span>
                     </div>
                 <?php else: ?>
                     <!-- プロフィール画像 -->
-                    <div class="col-3">
+                    <div class="col-sm-auto pr-0">
                         <img src="/img/default_icon.jpg" alt="profile_img" class="img-thumbnail" style="max-width:100px; max-height:100px; min-width:60px; min-height:60px;">
                     </div>
                     <!-- ユーザー名 -->
-                    <div class="col-9">
-                        <span class="h3 text-secondary">不明なユーザー</span>
+                    <div class="col-sm-7 mt-sm-0 mt-2 align-self-center">
+                        <span class="h4 text-secondary">不明なユーザー</span>
                     </div>
                 <?php endif; ?>
             </div>
         </div>
-        <div class="col-4 align-self-start text-right pr-5">
+        <div class="col-6 align-self-start text-right pr-4">
             <?php if($isMypage): ?>
                 <!-- 記事投稿ボタン -->
                 <p class="mb-3"><input type="button" class="btn btn-info btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
