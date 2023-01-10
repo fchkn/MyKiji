@@ -16,25 +16,27 @@
         <?php endif; ?>
         <b class ="text-secondary"><?php echo $search ?></b>
     </div>
-    <div class="row py-4 justify-content-center">
-        <?php if (empty($search_articles)): ?>
+    <?php if (empty($search_articles)): ?>
+        <div class="row py-4 justify-content-center">
             <!-- 検索不一致テキスト -->
             <h3 class="text-center text-secondary pb-5">検索に一致する記事はありませんでした</h3>
-        <?php else: ?>
-            <!-- ソートボタン -->
-            <div class="mb-4">
+        </div>
+    <?php else: ?>
+        <div class="row pt-3 pb-5 justify-content-center">
+            <!-- ソートセレクトボックス -->
+            <select class="custom-select custom-select-sm" onChange="location.href=value;" style="width:170px">
                 <?php if ($order == "desc"): ?>
-                    <button type='button' class="icon-btn" onclick="location.href='/articles/search?<?php echo $target ?>=<?php echo $search ?>&order=asc'">
-                        <img src="/img/article_sort_desc_icon.png" alt="desc_icon" style="height:35px;width:35px;">
-                    </button>
+                    <option value="/articles/search?<?php echo $target ?>=<?php echo $search ?>&order=desc" selected>投稿日時が新しい順</option>
+                    <option value="/articles/search?<?php echo $target ?>=<?php echo $search ?>&order=asc">投稿日時が古い順</option>
                 <?php elseif ($order == "asc"): ?>
-                    <button type='button' class="icon-btn" onclick="location.href='/articles/search?<?php echo $target ?>=<?php echo $search ?>&order=desc'">
-                        <img src="/img/article_sort_asc_icon.png" alt="asc_icon" style="height:35px;width:35px;">
-                    </button>
+                    <option value="/articles/search?<?php echo $target ?>=<?php echo $search ?>&order=desc">投稿日時が新しい順</option>
+                    <option value="/articles/search?<?php echo $target ?>=<?php echo $search ?>&order=asc" selected>投稿日時が古い順</option>
                 <?php endif; ?>
-            </div>
+            </select>
+        </div>
+        <div class="row pb-4 justify-content-center">
             <!-- 記事リスト -->
             <?= $this->element('article_list', ['articles' => $search_articles, 'model' => '']) ?>
-        <?php endif; ?>
-    </div>
+        </div>
+    <?php endif; ?>
 </div>
