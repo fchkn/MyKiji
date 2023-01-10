@@ -1,4 +1,4 @@
-<div class="list-group px-5">
+<div class="list-group px-md-5">
     <?php foreach ($follows as $follow) : ?>
         <!-- 記事リスト要素 -->
         <a href="/users/view?user_id=<?php echo $follow->{$target . '_user'}->id?>" style="text-decoration: none;">

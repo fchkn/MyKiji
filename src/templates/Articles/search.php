@@ -7,7 +7,7 @@
 ?>
 <?= $this->Flash->render() ?>
 <div class="container-fluid h-100" style="background: #f5f5f5;">
-    <div class="row pt-5 justify-content-center align-items-center">
+    <div class="row pt-3 justify-content-center align-items-center">
         <!-- 検索ワード・タグ -->
         <?php if ($target == "word"): ?>
             <span class="text-secondary">検索ワード:&nbsp</span>
@@ -16,7 +16,7 @@
         <?php endif; ?>
         <b class ="text-secondary"><?php echo $search ?></b>
     </div>
-    <div class="row py-5 justify-content-center">
+    <div class="row py-4 justify-content-center">
         <?php if (empty($search_articles)): ?>
             <!-- 検索不一致テキスト -->
             <h3 class="text-center text-secondary pb-5">検索に一致する記事はありませんでした</h3>

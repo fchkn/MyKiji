@@ -1,4 +1,4 @@
-<div class="list-group px-5">
+<div class="list-group px-md-5">
     <?php foreach ($favorites as $favorite) : ?>
         <!-- 記事リスト要素 -->
         <div class="list-group-item list-group-item-action mb-4 border-top rounded">

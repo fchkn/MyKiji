@@ -105,7 +105,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 py-5">
+        <div class="col-12 py-5 px-md-0 px-4">
             <!-- ナビゲーションタブ要素 -->
             <div class="tab-content">
                 <!-- 投稿記事 -->
