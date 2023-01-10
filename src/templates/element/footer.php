@@ -7,7 +7,7 @@
         </div>
         <div class="col-1"></div>
         <div class="col-11">
-            <span class="h6">© 2022 Masataka Saito</span>
+            <span class="h6">© 2023 Masataka Saito</span>
         </div>
     </div>
 </div>
