@@ -5,7 +5,7 @@
  */
 ?>
 <?= $this->Form->create($user, [
-    'class' => 'w-75 mx-auto',
+    'class' => 'mx-md-5 px-md-5 mx-sm-3 px-sm-3 mx-3 px-0',
     'type' => 'post',
     'name' => 'user_edit',
     'enctype' => 'multipart/form-data'

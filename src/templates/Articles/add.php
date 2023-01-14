@@ -35,7 +35,7 @@
         </div>
     </div>
     <!-- 記事タグ -->
-    <div class="row pb-5">
+    <div class="row pb-3">
         <div class="col-12">
             <?php for ($i = 1; $i <= 6; $i++) : ?>
                 <span class="pr-1">
@@ -47,7 +47,7 @@
     </div>
     <!-- 記事本文 -->
     <div class="row pb-5">
-        <div class="col-12 ql-container ql-snow">
+        <div class="col-12 ql-container ql-snow px-0">
             <textarea id="text" name="text" style="display:none"></textarea>
             <div class="ql-editor" id ="text_view"></div>
         </div>

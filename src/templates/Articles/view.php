@@ -11,7 +11,7 @@
 <div class="container-fluid bg-white" style="max-width: 850px">
     <?php if ($hasAuth && !$hasError && $auth_user->id == $article->user_id): ?>
         <div class="row article-edit-bar">
-            <div class="col-8 px-0 d-flex align-self-center justify-content-start">
+            <div class="col-12 px-0 d-flex align-self-center justify-content-start">
                 <!-- 記事編集ボタン -->
                 <button type="button" class="d-flex align-items-center border border-top-0" data-toggle="modal" data-target="#article_editor_modal">
                     <img class="rounded-circle icon article-edit-icon" src="/img/article_create_icon.png" alt="create_icon">
@@ -22,8 +22,6 @@
                     <img class="pr-2 rounded-circle icon article-edit-icon" src="/img/article_post_icon.png" alt="post_icon">
                     <span class="text-secondary">編集内容を保存する</span>
                 </button>
-            </div>
-            <div class="col-4 px-0 d-flex align-self-center justify-content-end">
                 <!-- 記事削除ボタン -->
                 <button type='button' class="d-flex align-items-center border border-top-0" name="delete_article" onclick="clickDeleteArticle(<?php echo $article->id ?>)">
                     <img class="rounded-circle icon article-edit-icon" src="/img/article_delete_icon.png" alt="delete_icon">
@@ -33,7 +31,7 @@
         </div>
     <?php endif; ?>
 
-    <div class="row px-5 pt-5 align-items-center">
+    <div class="row px-sm-5 px-1 pt-sm-5 pt-3 align-items-center">
         <!-- プロフィール画像・ユーザー名・投稿日・更新日 -->
         <div class="col-9">
             <?php if(!empty($user)): ?>
@@ -88,7 +86,7 @@
     </div>
 
     <!-- 記事タイトル -->
-    <div class="row px-5 pt-2 pb-3">
+    <div class="row px-sm-5 px-1 pt-2 pb-3">
         <div class="col-12">
             <?php if(!empty($article)): ?>
                 <input type="text" id="title" name="title" value="<?php echo $article->title ?>" style="display:none"></input>
@@ -100,7 +98,7 @@
     </div>
 
     <!-- 記事タグ -->
-    <div class="row px-5 pb-5">
+    <div class="row px-sm-5 px-1 pb-3">
         <div class="col-12">
             <?php if(!empty($article)): ?>
                 <?php for ($i = 1; $i <= 6; $i++) : ?>
@@ -112,14 +110,14 @@
                             <button type="button" class="mb-1 btn btn-outline-secondary btn-sm" id ="tag_<?php echo $i ?>_view" style="display:none"></button>
                         <?php endif; ?>
                     </span>
-                <? endfor; ?>
+                <?php endfor; ?>
             <?php endif; ?>
         </div>
     </div>
 
     <!-- 記事本文 -->
-    <div class="row px-5 pb-5">
-        <div class="col-12 ql-container ql-snow">
+    <div class="row px-sm-5 px-1 pb-5">
+        <div class="col-12 ql-container ql-snow px-0">
             <?php if(!empty($article)): ?>
                 <textarea id="text" name="text" style="display:none"><?php echo $article->text ?></textarea>
                 <div class="ql-editor" id ='text_view'><?php echo $article->text ?></div>

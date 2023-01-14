@@ -41,11 +41,11 @@ button:hover {
 }
 
 .ql-editor * img {
-    max-width: 50vw;
+    max-width: 80%;
 }
 
 #text_view * img {
-    max-width: 50vw;
+    max-width: 80%;
 }
 
 .col-12.ql-container.ql-snow {

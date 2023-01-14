@@ -6,7 +6,7 @@
 ?>
 <div class="container-fluid h-100">
     <div class="row pt-5">
-        <div class="col-8 align-self-center text-left pl-5">
+        <div class="col-6 align-self-center text-left pl-4">
             <div class="row h-auto">
                 <?php if(!empty($user)): ?>
                     <!-- プロフィール画像 -->
@@ -15,21 +15,21 @@
                     </div>
                     <!-- ユーザー名 -->
                     <div class="col-sm-7 mt-sm-0 mt-2 align-self-center">
-                        <span class="h3 text-secondary"><?php echo $user->name ?></span>
+                        <span class="h4 text-secondary"><?php echo $user->name ?></span>
                     </div>
                 <?php else: ?>
                     <!-- プロフィール画像 -->
-                    <div class="col-3">
+                    <div class="col-sm-auto pr-0">
                         <img src="/img/default_icon.jpg" alt="profile_img" class="img-thumbnail" style="max-width:100px; max-height:100px; min-width:60px; min-height:60px;">
                     </div>
                     <!-- ユーザー名 -->
-                    <div class="col-9">
-                        <span class="h3 text-secondary">不明なユーザー</span>
+                    <div class="col-sm-7 mt-sm-0 mt-2 align-self-center">
+                        <span class="h4 text-secondary">不明なユーザー</span>
                     </div>
                 <?php endif; ?>
             </div>
         </div>
-        <div class="col-4 align-self-start text-right pr-5">
+        <div class="col-6 align-self-start text-right pr-4">
             <?php if($isMypage): ?>
                 <!-- 記事投稿ボタン -->
                 <p class="mb-3"><input type="button" class="btn btn-info btn-sm" onclick="location.href='/articles/add'" value="記事を投稿する"/></p>
@@ -44,7 +44,7 @@
                         <!-- フォローボタン -->
                         <p><input type="button" class="btn btn-secondary btn-sm" onclick="location.href='/follows/add?follow_user_id=<?php echo $user->id ?>'" value="フォローする"/></p>
                     <?php endif; ?>
-                <? endif; ?>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
 
@@ -55,7 +55,7 @@
                     <a class="nav-link text-secondary border-left-0 active" data-toggle="tab" href="#post_article">
                         投稿記事(<?php
                             if (!empty($post_articles)) {
-                                echo $this->Paginator->counter('{{count}}', ['model' => 'articles']);
+                                echo $this->Paginator->counter('{{count}}', ['model' => 'Articles']);
                             } else {
                                 echo "0";
                             }
@@ -68,7 +68,7 @@
                         <a class="nav-link text-secondary" data-toggle="tab" href="#fav_article">
                             お気に入り記事(<?php
                                 if (!empty($favorites)) {
-                                    echo $this->Paginator->counter('{{count}}', ['model' => 'favorites']);
+                                    echo $this->Paginator->counter('{{count}}', ['model' => 'Favorites']);
                                 } else {
                                     echo "0";
                                 }
@@ -105,7 +105,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 py-5">
+        <div class="col-12 py-5 px-md-0 px-4">
             <!-- ナビゲーションタブ要素 -->
             <div class="tab-content">
                 <!-- 投稿記事 -->
@@ -114,7 +114,7 @@
                         <h3 class="text-center text-secondary">投稿記事はありません</h3>
                     <?php else: ?>
                         <div class="row justify-content-center">
-                            <?= $this->element('article_list', ['articles' => $post_articles, 'model' => 'articles']) ?>
+                            <?= $this->element('article_list', ['articles' => $post_articles, 'model' => 'Articles']) ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -124,7 +124,7 @@
                         <h3 class="text-center text-secondary">お気に入り記事はありません</h3>
                     <?php else: ?>
                         <div class="row justify-content-center">
-                            <?= $this->element('favorite_list', ['articles' => $favorites, 'model' => 'favorites']) ?>
+                            <?= $this->element('favorite_list', ['articles' => $favorites, 'model' => 'Favorites']) ?>
                         </div>
                     <?php endif; ?>
                 </div>

@@ -185,7 +185,7 @@ return [
      *   your application that still emit deprecations.
      */
     'Error' => [
-        'errorLevel' => E_ALL,
+        'errorLevel' => E_ALL ^ E_USER_DEPRECATED,
         'skipLog' => [],
         'log' => true,
         'trace' => true,
@@ -245,7 +245,6 @@ return [
             'client' => null,
             'tls' => false,
             'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
-            'from' => 'saitoDevtest@gmail.com',
         ],
     ],
 

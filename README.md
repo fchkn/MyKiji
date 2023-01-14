@@ -1,15 +1,43 @@
 # MyKiji
 
-## ■ コンテナ構成
-ローカル環境はDockerコンテナで構成しています。
-各コンテナと構成内容は以下の通りです。
-- mykiji-web-1 ⇒ nginx (http://localhost:34251/)
-- mykiji-app-1 ⇒ php
-- mykiji-db-1  ⇒ mysql
-- mykiji-phpmyadmin-1 ⇒ phpmyadmin (http://localhost:3000/)
+## ■ サービス内容
+記事を投稿することができるサイトです。<br>
+画像の添付・動画リンクの埋め込み等もできます。<br>
+サイトURL：https://mykiji.com
+
+## ■ 使用技術
+- PHP 8.1
+- CakePHP 4.4
+- Bootstrap 4.5
+- MySQL 8.0
+- nginx
+- Docker
+
+## ■ 機能一覧
+- 記事投稿
+- 記事編集
+- 記事削除
+- 記事一覧表示
+- 記事詳細表示
+- 記事検索
+- ユーザーログイン
+- ユーザー登録
+- ユーザー編集
+- ユーザー退会
+- ユーザーパスワード再発行
+- ユーザーフォロー機能
+- お気に入り記事登録
+
+## ■ ローカル環境
+ローカル環境はDockerコンテナで構成しています。<br>
+各コンテナ名とその内容は以下の通りです。
+- mykiji-web-1 ⇒ nginx (http://localhost:34251)
+- mykiji-app-1 ⇒ PHP
+- mykiji-db-1 ⇒ MySQL
+- mykiji-phpmyadmin-1 ⇒ phpmyadmin (http://localhost:3000)
 - mykiji-mailhog-1 ⇒ mailhog (http://localhost:8025)
 
-## ■ ローカル環境構築方法
+環境構築手順は以下の通りです。
 - ソースを取得する。<br>
 `$ git pull git@github.com:fchkn/MyKiji.git`
 - dockerイメージを取得する。※docker-compose.ymlがあるフォルダ内で実行すること。<br>
