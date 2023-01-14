@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 
 /**
  * Application Controller
@@ -28,6 +29,9 @@ use Cake\Controller\Controller;
  */
 class AppController extends Controller
 {
+    protected $hasAuth = false;
+    protected $auth_user = null;
+
     /**
      * Initialization hook method.
      *
@@ -43,11 +47,38 @@ class AppController extends Controller
 
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
+        $this->loadComponent('Authentication.Authentication');
 
         /*
          * Enable the following component for recommended CakePHP form protection settings.
          * see https://book.cakephp.org/4/en/controllers/components/form-protection.html
          */
         //$this->loadComponent('FormProtection');
+    }
+
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        // ログイン判定
+        $result = $this->Authentication->getResult();
+        if ($result->isValid()) {
+            $this->hasAuth = true;
+            $this->auth_user = $this->Authentication->getIdentity();
+        }
+        $hasAuth = $this->hasAuth;
+        $auth_user = $this->auth_user;
+
+        // 画像キャッシュ回避用パラメータ
+        $img_param = date('YmdHis');
+
+        // バージョン設定
+        $mykiji_ver = Configure::read("mykiji_ver");
+
+        // タイムゾーンをAsia/Tokyoに設定
+        date_default_timezone_set('Asia/Tokyo');
+
+        $this->set(compact('hasAuth', 'auth_user', 'img_param', 'mykiji_ver'));
+
+        // 共通レイアウト適用
+        $this->viewBuilder()->setLayout('common');
     }
 }

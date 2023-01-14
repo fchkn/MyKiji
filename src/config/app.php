@@ -87,6 +87,7 @@ return [
      * enable timestamping regardless of debug value.
      */
     'Asset' => [
+        'timestamp' => 'force',
         //'timestamp' => true,
         // 'cacheTime' => '+1 year'
     ],
@@ -184,7 +185,7 @@ return [
      *   your application that still emit deprecations.
      */
     'Error' => [
-        'errorLevel' => E_ALL,
+        'errorLevel' => E_ALL ^ E_USER_DEPRECATED,
         'skipLog' => [],
         'log' => true,
         'trace' => true,
@@ -228,13 +229,13 @@ return [
      */
     'EmailTransport' => [
         'default' => [
-            'className' => MailTransport::class,
+            'className' => 'Smtp',
             /*
              * The keys host, port, timeout, username, password, client and tls
              * are used in SMTP transports
              */
-            'host' => 'localhost',
-            'port' => 25,
+            'host' => 'mailhog',
+            'port' => 1025,
             'timeout' => 30,
             /*
              * It is recommended to set these options through your environment or app_local.php

@@ -1,0 +1,91 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+}
+
+main {
+    min-height: 100%;
+    background: #f5f5f5;
+    border: solid 30px #f5f5f5;
+}
+
+.logoimg {
+    height: 50px;
+}
+
+.logoimg:hover {
+    opacity: 0.75;
+}
+
+.userimg-article {
+    max-height:40px;
+    max-width:40px;
+}
+
+.username-header {
+    font-size: 0.9em;
+    vertical-align: middle;
+    display: inline-block;
+    max-width: 150px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.icon-btn {
+    background-color: transparent;
+    border-style: none;
+}
+
+.icon-btn:focus {
+    outline: none;
+}
+
+.page-link:focus {
+    z-index: 3;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem #e4e3e3;
+}
+
+.list-group {
+    width:800px;
+}
+
+.article-edit-bar {
+    background: #f5f5f5;
+}
+
+.article-edit-icon {
+    max-height:20px;
+    max-width:20px;
+}
+
+.error-message {
+    color:#dc3545;
+}
+
+.error-message * li{
+    list-style-type: none;
+}
+
+.message {
+    padding: 1rem;
+    background: #eff8ff;
+    color: #2779bd;
+    border-color: #6cb2eb;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.message.error {
+    background: #fcebea;
+    color: #cc1f1a;
+    border-color: #ef5753;
+}

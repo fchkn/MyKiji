@@ -8,6 +8,14 @@ RUN apk --no-cache update \
     && apk --no-cache add icu-dev zlib-dev libzip-dev mariadb mariadb-client vim \
     && docker-php-ext-configure intl \
     && docker-php-ext-install intl zip pdo pdo_mysql mysqli \
-    && docker-php-ext-enable intl
+    && docker-php-ext-enable intl \
+    && apk add autoconf \
+    && apk add gcc g++ make \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apk add libjpeg-turbo-dev libwebp-dev libpng-dev\
+    && docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
+
 
 WORKDIR /var/www

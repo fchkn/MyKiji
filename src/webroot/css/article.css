@@ -1,0 +1,53 @@
+img.icon {
+    max-width:80px; max-width:80px; min-width:30px; min-height:30px;
+}
+
+img.icon-favorite {
+    max-width:20px; max-width:20px; min-width:10px; min-height:10px;
+}
+
+img.icon-follow {
+    max-width:25px; max-width:25px; min-width:20px; min-height:20px;
+}
+
+button {
+    background-color: transparent;
+    border-style: none;
+}
+
+button:focus {
+    outline: none;
+}
+
+button:hover {
+    opacity: 0.75;
+}
+
+.modal-header {
+    border-style: none;
+}
+
+.modal-body {
+    height: 600px;
+    border-style: none;
+}
+
+.modal-footer {
+    border-style: none;
+}
+
+.ql-container {
+    height: 90%;
+}
+
+.ql-editor * img {
+    max-width: 80%;
+}
+
+#text_view * img {
+    max-width: 80%;
+}
+
+.col-12.ql-container.ql-snow {
+    border-style: none;
+}
